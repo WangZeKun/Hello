@@ -1,0 +1,117 @@
+/* CSS Document */
+
+* {
+	padding: 0px;
+	margin: 0px;
+}
+li {
+	padding: 10px 10px
+}
+a {
+	color: White;
+	border-radius: 10px;
+	font-family: adamina;
+	text-decoration: none;
+	padding: 8px 20px;
+	transition: 0.5s;
+	transition-property: all;
+}
+.head {
+	background-color: rgba(68,202,229,1.00);
+	padding-right: 30px
+}
+.head_tx {
+	position: relative;
+	z-index: 1;
+	float: right;
+	background-color: #4CAF50; /* Green */
+	border: none;
+	border-radius: 0px 0px 5px 5px;
+	padding: 5px 10px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	cursor: pointer;
+	font-size: 13px;
+}
+.head_tx:hover {
+	background-color: #4CAF50;
+}
+.title {
+	padding: 20px;
+	height: 20px;
+	position: relative;
+	align-items: center;
+	width: auto;
+	text-align: center;
+	display: block;
+}
+.title a {
+	font-size: 16px;
+}
+.title a:hover {
+	background-color: chartreuse;
+}
+.main {
+	padding: 0 10%;
+}
+.mian_text {
+	border-left: double 5px #00FF1D;
+	border-right: double 5px #00FF1D;
+	border-bottom: double 5px #00FF1D;
+	border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+	width: auto;
+	align-items: center;
+}
+.ur {
+	height: 37px;
+	color: #666;
+	width: 236px;
+	margin: 4px 28px;
+	padding-left: 10px;
+	font-size: 16pt;
+	font-family: Arial, Helvetica, sans-serif;
+}
+.xg {
+	height: 37px;
+	width: 236px;
+	font-size: 16pt;
+}
+.zhenwen {
+	text-align: center;
+	width: auto;
+	padding: 50px;
+}
+.zhenwen xmp {
+	text-align: left;
+	line-height: 20px;
+	font-size: 15px;
+}
+.zhenwen h2 {
+	padding: 10px;
+}
+.zhenwen button {
+}
+.text {
+	text-align: left;
+	width: 50%;
+	align-items: baseline;
+	padding: 0px 50px 0px 50px;
+}
+.text input, textarea {
+	height: 20px;
+	font-size: 16px;
+	border: none;
+}
+.text input:focus, textarea:focus {
+	border: solid 1px black;
+}
+.zs td {
+	padding: 0px 10px
+}
+.zs {
+	float: left;
+	padding: 0px 50px;
+	list-style: none;
+}
