@@ -40,4 +40,14 @@ func (e *Exam) updateScore(s Student){
 	}
 }
 
+func (s *Score)Update()(err error){
+	o:=orm.NewOrm()
+	_,err = o.Update(s)
+	return
+}
 
+func (s *Score)Insert()(err error){
+	o:=orm.NewOrm()
+	_,err = o.Insert(s)
+	return
+}
