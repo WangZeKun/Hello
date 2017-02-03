@@ -2,11 +2,15 @@ package main
 
 import (
 	_ "hello/routers"
+
 	"github.com/astaxie/beego"
 )
 
 func main() {
-	beego.SetStaticPath("/css","static/css")
+	// exam := models.Exam{Name:"aaaa"}
+	// exam.NewExam()
+	// exam.WriteExcel("111")
+	beego.SetStaticPath("/css", "static/css")
 	beego.Run()
 	/*
 		//var can []*models.Canjia
