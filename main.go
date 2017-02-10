@@ -11,6 +11,8 @@ func main() {
 	// exam.NewExam()
 	// exam.WriteExcel("111")
 	beego.SetStaticPath("/css", "static/css")
+	beego.SetStaticPath("/js", "static/js")
+	//beego.SetStaticPath("/css", "static/css")
 	beego.Run()
 	/*
 		//var can []*models.Canjia

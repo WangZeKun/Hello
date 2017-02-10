@@ -18,7 +18,7 @@ func (c *LoginController) Prepare() {
 }
 
 func (c *LoginController) Get() {
-	c.TplName = "go.html"
+	c.TplName = "layout1.html"
 }
 
 func (c *LoginController) Post() {

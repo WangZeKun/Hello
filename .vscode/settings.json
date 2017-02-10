@@ -10,6 +10,6 @@
         "go.useCodeSnippetsOnFunctionSuggest": false,
         "go.formatOnSave": false,
         "go.formatTool": "goreturns",
-        "go.goroot": "c:\\go",
-        "go.gopath": "d:\\MyGo"
+        "go.goroot": "/usr/local/go",
+        "go.gopath": "/home/zekin/mygo"
 }

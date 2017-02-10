@@ -12,7 +12,7 @@ var mouth_ = map[string]int{"January": 1, "February": 2, "March": 3, "April": 4,
 //对活动信息进行操作
 type Jion struct {
 	Id         int       `orm:"auto"`
-	Status     string    `orm:"size(1)"`
+	Status     string    `orm:"size(5)"`
 	Date       time.Time `orm:"auto_now_add;type(date)"`
 	ActivityId string
 	StudentId  string
