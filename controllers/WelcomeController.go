@@ -7,11 +7,13 @@ type WelcomeController struct {
 }
 
 func (c *WelcomeController) Prepare() {
-	sess := c.GetSession("username")
-	if sess != nil {
-		//c.Ctx.WriteString("Please login!\n")
-		c.Redirect("/mian", 302)
-	} else {
+		sess := c.GetSession("username")
+	se := c.GetSession("select")
+	if sess == nil || se == nil{
 		c.Redirect("/login", 302)
+	}else if se.(string)=="teacher"{
+		c.Redirect("/teacher/main",302)
+	} else if se.(string) == "student"{
+		c.Redirect("/main",302)
 	}
 }

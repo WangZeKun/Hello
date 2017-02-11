@@ -8,9 +8,12 @@ type ExitController struct {
 
 func (c *ExitController) Prepare() {
 	sess := c.GetSession("username")
-	if sess == nil {
+	se := c.GetSession("select")
+	if sess == nil || se == nil{
 		c.Redirect("/login", 302)
-	}
+	}else if se.(string)=="teacher"{
+		c.Redirect("/teacher/main",302)
+	} 
 }
 
 func (c *ExitController) Get() {

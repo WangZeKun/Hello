@@ -13,4 +13,5 @@ func init() {
 	beego.Router("/exit", &controllers.ExitController{})
 	beego.Router("/change", &controllers.ChangeController{})
 	beego.Router("/activities",&controllers.ActivityController{})
+	beego.Router("/teacher/main",&controllers.TeacherController{})
 }

@@ -46,6 +46,13 @@ func (c *Jion) CheckActivity() (out string) {
 	return out
 }
 
+//返回报名活动的同学
+func (c *Jion) CheckStudent() (out string) {
+	o := orm.NewOrm()
+	o.Raw("SELECT name FROM student WHERE id = ?", c.StudentId).QueryRow(&out)
+	return out
+}
+
 //得到活动的额外信息
 //使用json格式写入数据库
 func (c *Jion) GetMessage() (out map[string]string) {

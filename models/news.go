@@ -7,7 +7,6 @@ import "encoding/json"
 type Activity struct {
 	Id           string `orm:"pk"`
 	Name         string
-	Number       int
 	Introduction string
 	Isrecruit    bool
 	Message      string

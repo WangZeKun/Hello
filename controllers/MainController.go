@@ -13,8 +13,11 @@ type MainController struct {
 
 func (c *MainController) Prepare() {
 	sess := c.GetSession("username")
-	if sess == nil {
+	se := c.GetSession("select")
+	if sess == nil || se == nil{
 		c.Redirect("/login", 302)
+	}else if se.(string)=="teacher"{
+		c.Redirect("/teacher/main",302)
 	} else {
 		c.Layout = "layout.html"
 	}
