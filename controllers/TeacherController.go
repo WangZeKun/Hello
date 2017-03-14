@@ -1,9 +1,12 @@
 package controllers
 
-import(
-	 "github.com/astaxie/beego"
-	 "hello/models"
+import (
+	"encoding/json"
+	"github.com/astaxie/beego"
+	"hello/models"
+	"strconv"
 )
+
 type TeacherController struct {
 	beego.Controller
 }
@@ -11,17 +14,164 @@ type TeacherController struct {
 func (c *TeacherController) Prepare() {
 	sess := c.GetSession("username")
 	se := c.GetSession("select")
-	if sess == nil || se == nil{
+	if sess == nil || se == nil {
 		c.Redirect("/login", 302)
-	}else if se.(string)=="student"{
-		c.Redirect("/main",302)
+	} else if se.(string) == "student" {
+		c.Redirect("/main", 302)
 	}
 }
-func  (c *TeacherController) Get()  {
-    activities, err := models.ShowActivities()
+func (c *TeacherController) Get() {
+	sess := c.GetSession("username")
+	teacher := models.Teacher{Id: sess.(string)}
+	teacher.Read()
+	c.Data["teacher"] = teacher
+	c.TplName = "teacher.html"
+}
+
+func (c *TeacherController) Add() {
+	name := c.GetString("Name")
+	introduction := c.GetString("Introduction")
+
+	activity := models.Activity{
+		Name:         name,
+		Introduction: introduction,
+		WhoBuild:     c.GetSession("username").(string),
+	}
+	err := activity.Insert()
 	if err != nil {
+		beego.Error(err)
+		c.Abort("500")
+	}
+	//	c.Redirect("/teacher/main", 302)
+	c.ServeJSON()
+}
+
+func (c *TeacherController) Accept() {
+	ob := make(map[string]string)
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &ob)
+	if err != nil {
+		beego.Error(err)
+		c.Abort("500")
+	}
+	n, err := strconv.Atoi(ob["id"])
+	if err != nil {
+		beego.Error(err)
+		c.Abort("500")
+	}
+	activity := models.Activity{Id: n}
+	err = activity.Read()
+	if err != nil {
+		beego.Error(err)
+		c.Abort("500")
+	}
+	n, err = strconv.Atoi(ob["score"])
+	activity.Score = n
+	if err != nil {
+		beego.Error(err)
+		c.Abort("500")
+	}
+	activity.Impression = ob["impression"]
+	activity.ImagePath = ob["img"]
+	err = activity.Update()
+	if err != nil {
+		beego.Error(err)
+		c.Abort("500")
+	}
+	c.ServeJSON()
+}
+
+func (c *TeacherController) AddStu() {
+	jion := models.Jion{StudentId: c.GetString("name"), ActivityId: c.GetString("activityId")}
+	b := jion.Check()
+	if b {
 		return
 	}
-	c.Data["activities"] = activities
-	c.TplName = "teacher_main.html"
+	jion.Status = "审核通过"
+
+	err := jion.Insert()
+	if err != nil {
+		beego.Error("err")
+		c.Abort("500")
+	}
+	c.Redirect("/teacher/main", 302)
+}
+
+func (c *TeacherController) GetActivties() {
+	activities, err := models.ShowActivities(c.GetSession("username").(string))
+	if err != nil {
+		beego.Error(err)
+		c.Abort("500")
+	}
+
+	c.Data["json"] = activities
+	c.ServeJSON()
+}
+
+func (c *TeacherController) GetJions() {
+	id, err := c.GetInt("id")
+	if err != nil {
+		beego.Error(err)
+		c.Abort("500")
+	}
+	a := models.Activity{Id: id}
+	j, err := a.ShowWhoJion()
+	if err != nil {
+		beego.Error(err)
+		c.Abort("500")
+	}
+	c.Data["json"] = j
+	c.ServeJSON()
+}
+
+func (c *TeacherController) SetStatus() {
+	id, err := c.GetInt("jionid")
+	if err != nil {
+		beego.Error(err)
+		c.Abort("500")
+	}
+	status := c.GetString("status")
+	j := models.Jion{Id: id, Status: status}
+	err = j.Update()
+	if err != nil {
+		beego.Error(err)
+		c.Abort("500")
+	}
+	c.ServeJSON()
+}
+
+func (c *TeacherController) DelActivity() {
+	id, err := c.GetInt("id")
+	if err != nil {
+		beego.Error(err)
+		c.Abort("500")
+	}
+	a := models.Activity{Id: id}
+	err = a.Delete()
+	if err != nil {
+		beego.Error(err)
+		c.Abort("500")
+	}
+	c.ServeJSON()
+}
+
+func (c *TeacherController) GetClass() {
+	class, err := models.CheckClass(c.GetString("grade"))
+	if err != nil {
+		beego.Error(err)
+		c.Abort("500")
+	}
+	c.Data["json"] = class
+	c.ServeJSON()
+}
+
+func (c *TeacherController) GetStudent() {
+	student, err := models.CheckStudent(c.GetString("grade"), c.GetString("class"))
+	if err != nil {
+		beego.Error(err)
+		c.Abort("500")
+	}
+
+	c.Data["json"] = student
+	c.ServeJSON()
+	return
 }

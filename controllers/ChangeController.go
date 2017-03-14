@@ -13,12 +13,12 @@ type ChangeController struct {
 func (c *ChangeController) Prepare() {
 	sess := c.GetSession("username")
 	se := c.GetSession("select")
-	if sess == nil || se == nil{
+	if sess == nil || se == nil {
 		c.Redirect("/login", 302)
-	}else if se.(string)=="teacher"{
-		c.Redirect("/teacher/main",302)
+	} else if se.(string) == "teacher" {
+		c.Redirect("/teacher/main", 302)
 	} else {
-		c.Layout = "layout.html"
+		c.Layout = "student.html"
 	}
 }
 
@@ -47,7 +47,7 @@ func (c *ChangeController) Post() {
 		user.Password = password
 		err = user.Update()
 		if err == nil {
-			c.Data["Text"] = "修改成功！"
+			c.Data["Text"] = "修改成功"
 			c.TplName = "message.tpl"
 		}
 	}
