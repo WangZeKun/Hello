@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>北京市广渠门中学志愿活动管理</title>
+    <link href="/css/semantic.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Fixed navbar -->
+    <div class="ui violet inverted top fixed menu">
+        <div class="item">
+            <img src="/img/logo.png">
+        </div>
+        <a class="item" href="/check">北京市广渠门中心志愿活动管理</a>
+        <div class="right menu" style="padding-right: 20px">
+            <a class="item" class="active" href="/teacher/main">主页</a>
+            <a class="item" href="/exit">退出登录</a>
+        </div>
+    </div>
+    <br />
+    <br />
+    <br />
+    <br />
+    <div class="ui container" id="check">
+        <div class="inline field">
+            <h1 class="ui header">已结束活动</h1>
+            <label>请选择年级：</label>
+            <select v-model="selectGrade" @change="checkClass" class="ui search dropdown">
+                <option v-for="i in grade" :value=i>
+                    {{i}}
+                </option>
+            </select>
+            <label>请选择班级：</label>
+            <select v-model="selectClass" class="ui search dropdown">
+                <option v-for="i in classes" :value=i>
+                    {{i}}
+                </option>
+            </select>
+            <button type="button" @click="checkStudent" class="ui green button">查询</button>
+        </div>
+        <table class="ui blue table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>年级</th>
+                    <th>班级</th>
+                    <th>姓名</th>
+                    <th>参加活动次数</th>
+                    <th>总工时</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(student,index) in students">
+                    <td scope="row">{{index+1}}</td>
+                    <td>{{student.Grade}}</td>
+                    <td>{{student.Class}}</td>
+                    <td>{{student.Name}}</td>
+                    <td>{{student.Num}}</td>
+                    <td>{{student.Score}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+        <script src="/js/jquery.min.js"></script>
+        <!-- Include all compiled plugins (below), or include individual files as needed -->
+        <script src="/js/semantic.min.js"></script>
+        <script src="/js/vue.js"></script>
+        <script src="/js/axios.min.js"></script>
+        <script>
+        var check = new Vue({
+            el: '#check',
+            data: function() {
+                return {
+                    grade: ['初一', '初二', '初三', '高一', '高二', '高三'],
+                    selectGrade: '',
+                    classes: [],
+                    students: [],
+                    selectClass: '',
+                    classurl: '/teacher/class',
+                    checkurl: '/check/score'
+                }
+            },
+            methods: {
+                checkClass: function() {
+                    axios.get(this.classurl, {
+                            params: {
+                                grade: this.selectGrade,
+                            }
+                        })
+                        .then(response => {
+                            this.classes = response.data;
+                            this.classes.push("全年级")
+                        })
+                        .catch(function(error) {
+                            console.log(error)
+                        })
+                },
+                checkStudent: function() {
+                    if (this.selectClass === "全年级"){
+                        this.selectClass = "";
+                    }
+                    axios.get(this.checkurl, {
+                            params: {
+                                grade: this.selectGrade,
+                                class: this.selectClass,
+                            }
+                        })
+                        .then(response => {
+                            this.students = response.data;
+                        })
+                        .catch(function(error) {
+                            console.log(error);
+                        })
+                },
+            }
+        })
+        $('select.dropdown')
+            .dropdown();
+        </script>
+</body>
+
+</html>

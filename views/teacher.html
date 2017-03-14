@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>北京市广渠门中学志愿活动管理</title>
+    <!-- Bootstrap -->
+    <link href="/css/buttons.css" rel="stylesheet">
+    <link href="/css/semantic.min.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+    <div class="ui violet inverted top fixed menu">
+        <div class="item">
+            <img src="/images/logo.png">
+        </div>
+        <a class="item" href="/end">北京市广渠门中心志愿活动管理</a>
+        <div class="right menu" style="padding-right: 20px">
+            <a class="item" onclick="addmodal()">添加活动</a>
+            <a class="item" onclick="addStumodal()">添加学生</a>
+            <a class="item" onclick="endmodal()">结束活动</a>
+            <a class="item" href="/exit">退出登录</a>
+        </div>
+    </div>
+    <br />
+    <br />
+    <br />
+    <br />
+    <div class="ui container" id="activities">
+        <h1 class="ui header">活动综述</h1>
+        <div class="ui divider"></div>
+        <div class="ui top attached tabular menu">
+            <a v-for="a of activitie" class="item" v-bind:class="{active: (isActive===a.Id)}" v-on:click="active(a)">
+                <button style="border-style :none;background: none" onclick="$('#table').dimmer('show')"><i class="remove icon"></i></button>{{a.Name}}</a>
+        </div>
+        <div class="ui bottom attached active tab segment" id="table">
+            <table class="ui orange table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>年级</th>
+                        <th>班级</th>
+                        <th>姓名</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-if="jions===''">
+                        <td>并没有人来报名</td>
+                    </tr>
+                    <tr v-else v-for="(jion,index) in jions">
+                        <td scope="row">{{index+1}}</td>
+                        <td>{{jion.Grade}}</td>
+                        <td>{{jion.Class}}</td>
+                        <td>{{jion.Name}}</td>
+                        <td>{{jion.Status}}</td>
+                        <td>
+                            <div class="ui buttons">
+                                <button class="ui pink button" @click="setStatus(jion.Id,'审核通过')">通过</button>
+                                <div class="or"></div>
+                                <button class="ui grey button" @click="setStatus(jion.Id,'审核不通过')">不通过</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="ui dimmer">
+                <div class="content">
+                    <div class="center">
+                        <h2 class="ui inverted icon header">
+                            <i class="frown icon"></i>
+                                确定要删除此活动吗？
+                        </h2>
+                        <button class="ui blue button" @click="delActivity(activity.Id)">是的</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <h3 v-if="activitie===''">还没有发布活动哦</h3>
+    </div>
+    <div class="ui modal" id="end">
+        <i class="close icon"></i>
+        <div class="header">
+            结束活动
+        </div>
+        <div class="ui form content">
+            <div v-show="message!=''" class="ui ignore info message">
+                <strong>warning!</strong> {{message}}
+            </div>
+            <div class="inline field">
+                <label>请选择活动:</label>
+                <select v-model="selected" class="ui search dropdown">
+                    <option v-for="a in activities" :value="a.Id">
+                        {{a.Name}}
+                    </option>
+                </select>
+            </div>
+            <div class="inline field">
+                <label>请输入工时:</label>
+                <input type="text" v-model="score">
+            </div>
+            <div class="field">
+                <label>活动感受</label>
+                <textarea rows="6" v-model="impression"></textarea>
+            </div>
+            <div class="field">
+                <label>提交活动图片</label>
+                <input type="file" @change="onFileChange" multiple="multiple" accept="image/png,image/jpg">
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui black deny button">
+                关闭
+            </div>
+            <div class="ui positive right labeled icon button">
+                确定
+                <i class="checkmark icon"></i>
+            </div>
+        </div>
+    </div>
+    <div class="ui modal" id="add">
+        <i class="close icon"></i>
+        <div class="header">
+            添加活动
+        </div>
+        <div class="ui form content">
+            <div v-show="message!=''" class="ui ignore info message">
+                <strong>warning!</strong> {{message}}
+            </div>
+            <div class="field">
+                <label>活动名称:</label>
+                <input type="text" v-model="Name">
+            </div>
+            <div class="field">
+                <label>活动简介:</label>
+                <textarea rows="6" v-model="Introduction"></textarea>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui black deny button">
+                关闭
+            </div>
+            <div class="ui positive right labeled icon button">
+                确定
+                <i class="checkmark icon"></i>
+            </div>
+        </div>
+    </div>
+    <div class="ui small modal" id="addStu">
+        <i class="close icon"></i>
+        <div class="header">
+            添加学生
+        </div>
+        <div class="ui form content">
+            <div v-show="message!=''" class="ui ignore info message">
+                <strong>warning!</strong> {{message}}
+            </div>
+            <div class="inline field">
+                <label>请选择活动：</label>
+                <select v-model="selected" class="ui search dropdown">
+                    <option v-for="a in activities" :value="a.Id">
+                        {{a.Name}}
+                    </option>
+                </select>
+            </div>
+            <div class="inline field">
+                <label>请选择年级：</label>
+                <<<if .teacher.Grade>>>
+                    <select class="ui search dropdown" disabled="disabled">
+                        <option selected="selected">
+                            <<<.teacher.Grade>>>
+                        </option>
+                    </select>
+                    <<<else>>>
+                        <select v-model="selectGrade" @change="checkClass" class="ui search dropdown">
+                            <option v-for="i in grade" :value=i>
+                                {{i}}
+                            </option>
+                        </select>
+                        <<<end>>>
+            </div>
+            <div class="inline field">
+                <label>请选择班级：</label>
+                <<<if .teacher.Class>>>
+                    <select class="ui search dropdown" disabled="disabled">
+                        <option selected="selected">
+                            <<<.teacher.Class>>>
+                        </option>
+                    </select>
+                    <<<else>>>
+                        <select v-model="selectClass" @change="checkStudent" class="ui search dropdown">
+                            <option v-for="i in classes" :value=i>
+                                {{i}}
+                            </option>
+                        </select>
+                        <<<end>>>
+            </div>
+            <div class="inline field">
+                <label>请选择同学：</label>
+                <select v-model="selectStudent" class="ui search dropdown">
+                    <option v-for="i in student" :value=i.Id>
+                        {{i.Name}}
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui black deny button">
+                关闭
+            </div>
+            <div class="ui positive right labeled icon button">
+                确定
+                <i class="checkmark icon"></i>
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    </div>
+    </div>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/vue.js"></script>
+    <script src="/js/axios.min.js"></script>
+    <script type="text/javascript">
+    var activities = new Vue({
+        el: '#activities',
+        mounted: function() {
+            this.getActivities()
+        },
+        methods: {
+            getActivities: function() {
+                axios.get(this.url)
+                    .then(response => {
+                        this.activitie = response.data;
+                        end.activities = this.activitie;
+                        addStu.activities = this.activitie;
+                        this.activity = this.activitie[0];
+                        this.isActive = this.activity.Id;
+                        this.getActivity();
+                    }).catch(function(error) {
+                        console.log(error);
+                    });
+            },
+
+            getActivity: function() {
+                axios.get(this.geturl, {
+                        params: {
+                            id: this.activity.Id
+                        }
+                    })
+                    .then(response => {
+                        this.jions = response.data
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    });
+            },
+            setStatus: function(jionid, status) {
+                axios.get(this.seturl, {
+                        params: {
+                            jionid: jionid,
+                            status: status,
+                        }
+                    })
+                    .then(response => {
+                        this.getActivity();
+
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    });
+            },
+            delActivity: function(activityid) {
+                axios.get(this.delurl, {
+                        params: {
+                            id: activityid
+                        }
+                    })
+                    .then(response => {
+                        this.getActivities();
+                        $('#table').dimmer('hide');
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    });
+
+            },
+
+            active: function(a) {
+                if (this.isActive !== a.Id) {
+                    this.isActive = a.Id;
+                    this.activity = a;
+                    $('#table').dimmer('hide');
+                    this.getActivity();
+                }
+
+            },
+
+        },
+        data: function() {
+            return {
+                url: '/teacher/activities',
+                geturl: '/teacher/activity',
+                seturl: '/teacher/set',
+                delurl: '/teacher/del',
+                activity: {},
+                activitie: [],
+                jions: [],
+                isActive: '',
+            }
+
+        }
+    })
+
+    var add = new Vue({
+        el: '#add',
+        data: {
+            Name: '',
+            Introduction: '',
+            message: '',
+            url: '/teacher/add',
+        },
+        methods: {
+            addActivities: function() {
+                if (this.Name === "") {
+                    this.message = "请输入活动名称!";
+                    return
+                } else if (this.Introduction === "") {
+                    this.message = "请输入活动内容！";
+                    return
+                }
+                axios.get(this.url, {
+                        params: {
+                            Name: this.Name,
+                            Introduction: this.Introduction,
+                        }
+                    })
+                    .then(response => {
+                        activities.getActivities();
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    })
+                $('#add').modal('hide');
+                this.Name = '';
+                this.message = '';
+                this.Introduction = "";
+            }
+        }
+
+    })
+
+    var end = new Vue({
+        el: '#end',
+        data: function() {
+            return {
+                score: '',
+                message: '',
+                image: '',
+                images: [],
+                impression: '',
+                selected: '',
+                activities: [],
+                url: '/teacher/accept'
+            }
+        },
+        methods: {
+            onFileChange(e) {
+                var files = e.target.files || e.dataTransfer.files;
+                this.images = [];
+                if (!files.length)
+                    return;
+                for (var i = 0; i < files.length; i++) {
+                    this.createImage(files[i]);
+                }
+            },
+            createImage(file) {
+                var image = new Image();
+                var reader = new FileReader();
+
+                reader.onload = (e) => {
+                    this.images.push(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            },
+            endActvities: function() {
+                if (this.selected === '') {
+                    this.message = "请输入选择活动！";
+                    return
+                } else if (this.score === '') {
+                    this.message = "请输入获得工时！";
+                    return
+                } else if (this.impression === '') {
+                    this.message = "请输入活动感受！";
+                    return
+                }
+                axios.post(this.url, {
+                        img: JSON.stringify(this.images),
+                        impression: this.impression,
+                        score: this.score,
+                        id: "" + this.selected
+                    })
+                    .then(response => {
+                        activities.getActivities();
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    })
+                $('#end').modal('hide');
+                this.impression = '';
+                this.score = '';
+                this.selected = '';
+                this.images = [];
+                this.message = '';
+            }
+        }
+    })
+
+    var addStu = new Vue({
+        el: '#addStu',
+        data: function() {
+            return {
+                grade: ['初一', '初二', '初三', '高一', '高二', '高三'],
+                selectGrade: '<<<.teacher.Grade>>>',
+                isGrade: false,
+                classes: [],
+                selectClass: '<<<.teacher.Class>>>',
+                isClass: false,
+                student: [],
+                selectStudent: '',
+                activities: [],
+                classurl: '/teacher/class',
+                studenturl: '/teacher/student',
+                addurl: '/teacher/addStu',
+                selected: '',
+                message: '',
+            }
+        },
+        <<<if .teacher.Grade>>>
+        <<<if .teacher.Class>>>
+        mounted: function(){
+            this.checkStudent();
+        },
+        <<< end >>>
+        <<< end >>>
+        methods: {
+            clear: function() {
+                this.selectGrade = '';
+                this.classes = [];
+                this.selectClass = '';
+                this.student = [];
+                this.selectStudent = '';
+                this.selected = '';
+                this.message = '';
+            },
+            checkClass: function() {
+                axios.get(this.classurl, {
+                        params: {
+                            grade: this.selectGrade,
+                        }
+                    })
+                    .then(response => {
+                        this.classes = response.data;
+                    })
+                    .catch(function(error) {
+                        console.log(error)
+                    })
+            },
+            checkStudent: function() {
+                axios.get(this.studenturl, {
+                        params: {
+                            grade: this.selectGrade,
+                            class: this.selectClass,
+                        }
+                    })
+                    .then(response => {
+                        this.student = response.data;
+                    })
+                    .catch(function(error) {
+                        console.log(error)
+                    })
+            },
+            addstu: function() {
+                if (this.selected === "") {
+                    this.message = "请选择活动！";
+                    return
+                } else if (this.selectStudent === "") {
+                    this.message = "请选择添加的同学！";
+                    return
+                }
+                axios.get(this.addurl, {
+                        params: {
+                            name: this.selectStudent,
+                            activityId: this.selected,
+                        }
+                    })
+                    .then(response => {
+                        activities.activitie = [],
+                            activities.getActivities()
+                    })
+                    .catch(function(error) {
+                        console.log(error)
+                    })
+
+                $('#addStu').modal('hide');
+                this.clear();
+            }
+        }
+    })
+    </script>
+    <script src="/js/semantic.min.js"></script>
+    <script type="text/javascript">
+    function endmodal() {
+        $('#end').modal({
+                closable: false,
+                onApprove: function() {
+                    end.endActvities();
+                    return false;
+                }
+            })
+            .modal('show')
+    }
+
+    function addmodal() {
+        $('#add').modal({
+                closable: false,
+                onApprove: function() {
+                    add.addActivities();
+                    return false;
+                }
+            })
+            .modal('show')
+    }
+
+    function addStumodal() {
+        $('#addStu').modal({
+                closable: false,
+                onApprove: function() {
+                    addStu.addstu();
+                    return false;
+                }
+            })
+            .modal('show')
+    }
+
+    $('select.dropdown')
+        .dropdown();
+    </script>
+</body>
+
+</html>

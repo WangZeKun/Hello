@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>北京市广渠门中学志愿活动管理</title>
+
+    <!-- Bootstrap -->
+    <link href="/css/semantic.min.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+	    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+	    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
+</head>
+
+<body>
+    <!-- Fixed navbar -->
+    <div class="ui violet inverted top fixed menu">
+        <div class="item">
+            <img src="/img/logo.png">
+        </div>
+        <a class="item" href="/check">北京市广渠门中心志愿活动管理</a>
+        <div class="right menu" style="padding-right: 20px">
+            <a class="item" class="active" href="/teacher/main">主页</a>
+            <a class="item" href="/exit">退出登录</a>
+        </div>
+    </div>
+    <br />
+    <br />
+    <br />
+    <br />
+    <div class="ui container" id="activities">
+        <h1 class="ui header">活动综述</h1>
+        <div class="ui divider"></div>
+        <div class="ui grid">
+            <div class="four wide column">
+                <div class="ui vertical fluid tabular menu">
+                    <a v-for="a of activitie" class="item" v-bind:class="{active: (isActive===a.Id)}" v-on:click="active(a)">{{a.Name}}</a>
+                </div>
+            </div>
+            <div class="twelve wide stretched column">
+                <table class="ui green table">
+                    <caption>
+                        <h3 class="ui header">发起人： {{ activity.WhoBuild }} 所得工时：{{ activity.Score}}</h3></caption>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>年级</th>
+                            <th>班级</th>
+                            <th>姓名</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="jions===null">
+                            <td>并没有人来报名</td>
+                        </tr>
+                        <tr v-else v-for="(jion,index) in jions">
+                            <td scope="row">{{index}}</td>
+                            <td>{{jion.Grade}}</td>
+                            <td>{{jion.Class}}</td>
+                            <td>{{jion.Name}}</td>
+                            <td>{{jion.Status}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3 class="ui header">活动感受</h3>
+                <div class="ui stacked segment">
+                    <p v-if="activity.Impression==''">并没有活动感受</p>
+                    <xmp v-else>{{activity.Impression}}</xmp>
+                    <div class="ui medium images ">
+                        <p v-if="image ==''">并没有活动照片</p>
+                        <p v-else><img v-for="i in image" v-bind:src="i" class="ui image" /></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="/js/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/js/vue.js"></script>
+    <script src="/js/axios.min.js"></script>
+    <script>
+    var activities = new Vue({
+        el: '#activities',
+        mounted: function() {
+            this.getActivities()
+        },
+        methods: {
+            getActivities: function() {
+                axios.get(this.url)
+                    .then(response => {
+                        this.activitie = response.data;
+                        this.activity = this.activitie[0]
+                        this.isActive = this.activity.Id
+                        this.getActivity();
+                    }).catch(function(error) {
+                        console.log(error);
+                    });
+            },
+            getActivity: function() {
+                axios.get(this.geturl, {
+                        params: {
+                            id: this.activity.Id
+                        }
+                    })
+                    .then(response => {
+                        this.jions = response.data;
+                        this.image = JSON.parse(this.activity.ImagePath);
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    });
+            },
+            active: function(a) {
+                if (this.isActive !== a.Id) {
+                    this.isActive = a.Id;
+                    this.activity = a;
+                    this.getActivity();
+                }
+
+            },
+        },
+        data: function() {
+            return {
+                url: '/end/activities',
+                geturl: '/end/activity',
+                activitie: [],
+                activity: {},
+                jions: [],
+                image: [],
+                isActive: '',
+            }
+
+        }
+    })
+    </script>
+</body>
+
+</html>
