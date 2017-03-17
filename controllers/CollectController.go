@@ -10,17 +10,7 @@ type CollectController struct {
 }
 
 func (c *CollectController) Prepare() {
-	sess := c.GetSession("username")
-	se := c.GetSession("select")
-	if sess == nil || se == nil {
-		c.Redirect("/login", 302)
-	} else if sess.(string) != "root" {
-		if se.(string) == "student" {
-			c.Redirect("/main", 302)
-		} else {
-			c.Redirect("/teacher/main", 302)
-		}
-	}
+	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", "*")
 }
 
 func (c *CollectController) Get() {

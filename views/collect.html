@@ -7,26 +7,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
     <title>北京市广渠门中学志愿活动管理</title>
-
     <!-- Bootstrap -->
     <link href="/css/semantic.min.css" rel="stylesheet">
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
-	    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-	    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
-	<![endif]-->
+        <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
 </head>
 
 <body>
     <!-- Fixed navbar -->
     <div class="ui violet inverted top fixed menu">
         <div class="item">
-            <img src="/img/logo.png">
+            <img src="/images/logo.png">
         </div>
         <a class="item" href="/check">北京市广渠门中心志愿活动管理</a>
         <div class="right menu" style="padding-right: 20px">
-            <a class="item" class="active" href="/teacher/main">主页</a>
+            <a class="item" class="active" href="/teacher">主页</a>
             <a class="item" href="/exit">退出登录</a>
         </div>
     </div>
@@ -81,12 +80,12 @@
             </div>
         </div>
     </div>
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="/js/jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="/js/vue.js"></script>
     <script src="/js/axios.min.js"></script>
     <script>
+    let getactivitiesurl = '/message/teacher/Cactivities';
+    let getactivityurl = '/message/teacher/Cactivity';
     var activities = new Vue({
         el: '#activities',
         mounted: function() {
@@ -94,7 +93,7 @@
         },
         methods: {
             getActivities: function() {
-                axios.get(this.url)
+                axios.get(getactivitiesurl)
                     .then(response => {
                         this.activitie = response.data;
                         this.activity = this.activitie[0]
@@ -105,7 +104,7 @@
                     });
             },
             getActivity: function() {
-                axios.get(this.geturl, {
+                axios.get(getactivityurl, {
                         params: {
                             id: this.activity.Id
                         }
@@ -129,8 +128,6 @@
         },
         data: function() {
             return {
-                url: '/end/activities',
-                geturl: '/end/activity',
                 activitie: [],
                 activity: {},
                 jions: [],

@@ -14,13 +14,7 @@ type MainController struct {
 }
 
 func (c *MainController) Prepare() {
-	sess := c.GetSession("username")
-	se := c.GetSession("select")
-	if sess == nil || se == nil {
-		c.Redirect("/login", 302)
-	} else if se.(string) == "teacher" {
-		c.Redirect("/teacher/main", 302)
-	}
+	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", "*")
 }
 
 func (c *MainController) Get() {

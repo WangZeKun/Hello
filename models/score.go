@@ -21,9 +21,12 @@ func (e *Exam) GetScore(s Student) (data []Score, err error) {
 	return
 }
 
-func (e *Exam) updateScore(s Student) {
+func (e *Exam) updateScore(s Student) (err error) {
 	o := orm.NewOrm()
-	data, _ := e.GetScore(s)
+	data, err := e.GetScore(s)
+	if err != nil {
+		return
+	}
 	var exsit = false
 	score := Score{StudentId: s.Id, ExamId: string(e.Id), Object: "总分"}
 	for _, s1 := range data {
@@ -34,10 +37,11 @@ func (e *Exam) updateScore(s Student) {
 		}
 	}
 	if exsit {
-		o.Update(score)
+		_, err = o.Update(score)
 	} else {
-		o.Insert(score)
+		_, err = o.Insert(score)
 	}
+	return
 }
 
 func (e *Exam) NewExam() (err error) {

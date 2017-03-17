@@ -40,8 +40,8 @@
     <div class="ui middle aligned center aligned grid">
         <div class="column">
             <h2 class="ui header">
-        Log-in to your account
-    </h2>
+                Log-in to your account
+            </h2>
             <form class="ui large form" id="login">
                 <div class="ui stacked segment">
                     <div class="field">
@@ -69,6 +69,7 @@
         </div>
     </div>
     <script>
+    let loginurl = '/message/login'
     var login = new Vue({
         el: '#login',
         data: function() {
@@ -77,12 +78,11 @@
                 username: '',
                 password: '',
                 message: '',
-                url: '/l'
             }
         },
         methods: {
             login: function() {
-                axios.get(this.url, {
+                axios.get(loginurl, {
                         params: {
                             select: this.select,
                             username: this.username,
@@ -91,10 +91,10 @@
                     })
                     .then(response => {
                         if (response.data == "success student") {
-                            self.location = '/main'
+                            self.location = '/student'
                             return
                         } else if (response.data == "success teacher") {
-                            self.location = "/teacher/main"
+                            self.location = "/teacher"
                             return
                         }
                         this.message = response.data;

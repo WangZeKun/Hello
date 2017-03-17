@@ -12,14 +12,9 @@ type TeacherController struct {
 }
 
 func (c *TeacherController) Prepare() {
-	sess := c.GetSession("username")
-	se := c.GetSession("select")
-	if sess == nil || se == nil {
-		c.Redirect("/login", 302)
-	} else if se.(string) == "student" {
-		c.Redirect("/main", 302)
-	}
+	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", "*")
 }
+
 func (c *TeacherController) Get() {
 	sess := c.GetSession("username")
 	teacher := models.Teacher{Id: sess.(string)}

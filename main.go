@@ -1,30 +1,52 @@
 package main
 
 import (
-	_ "hello/routers"
-
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/context"
+	_ "hello/routers"
 )
 
-func main() {
-	// exam := models.Exam{Name:"aaaa"}
-	// exam.NewExam()
-	// exam.WriteExcel("111")
-	beego.SetStaticPath("/css", "static/css")
-	beego.SetStaticPath("/js", "static/js")
-	//beego.SetStaticPath("/css", "static/css")
-	beego.Run()
-	/*
-		//var can []*models.Canjia
-		o := orm.NewOrm()
-		var users []User
-		o.Raw("SELECT username, password FROM login ").QueryRows(&users)
-		for _,i := range users{
+var FilterTeacher = func(ctx *context.Context) {
+	s := ctx.Input.Session("select")
+	if s == nil {
+		ctx.Redirect(302, "/login")
+	} else if s == "student" {
+		ctx.Redirect(302, "/student")
+	}
+}
 
-			if len(i.Username)==7{
-				fmt.Printf("%d",len(i.Username))
-				o.Raw("UPDATE login SET `username` = ?,`password`=? WHERE `username` = ?","0"+i.Username,"0"+i.Password,i.Username).Exec()
-			}
-		}
-	*/
+var FilterStudent = func(ctx *context.Context) {
+	s := ctx.Input.Session("select")
+	if s == nil {
+		ctx.Redirect(302, "/login")
+	} else if s.(string) == "teacher" {
+		ctx.Redirect(302, "/teacher")
+	}
+}
+
+var FilterMessageStudent = func(ctx *context.Context) {
+	s := ctx.Input.Session("select")
+	if s == nil || s.(string) == "teacher" {
+		ctx.Abort(401, "")
+	}
+}
+
+var FilterMessageTeacher = func(ctx *context.Context) {
+	s := ctx.Input.Session("select")
+	if s == nil || s.(string) == "student" {
+		ctx.Abort(401, "")
+	}
+}
+
+func main() {
+	beego.SetStaticPath("/css", "views/css")
+	beego.SetStaticPath("/images", "views/image")
+	beego.SetStaticPath("/js", "views/js")
+	beego.SetStaticPath("/fonts", "views/fonts")
+	beego.SetLogger("file", `{"filename":"logs/test.log"}`)
+	beego.InsertFilter("/teacher", beego.BeforeRouter, FilterTeacher)
+	beego.InsertFilter("/student", beego.BeforeRouter, FilterStudent)
+	beego.InsertFilter("/message/student/*", beego.BeforeRouter, FilterMessageStudent)
+	beego.InsertFilter("/message/teacher/*", beego.BeforeRouter, FilterMessageTeacher)
+	beego.Run()
 }
