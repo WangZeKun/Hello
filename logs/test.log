@@ -3186,3 +3186,31 @@
 2017/03/26 19:44:18 [D] [template.go:171] parse template err: check.html template: check.html:19: unexpected "<" in command
 2017/03/26 19:44:18 [D] [template.go:171] parse template err: collect.html template: collect.html:26: unexpected "<" in command
 2017/03/26 19:44:18 [I] [asm_amd64.s:1998] http server Running on http://:8080
+2017/03/26 19:46:11 [D] [server.go:2081] |      127.0.0.1|[42m 200 [0m|   1.086711ms|   match|[44m GET     [0m /login   r:/login
+2017/03/26 19:46:11 [D] [server.go:2081] |      127.0.0.1|[47m 304 [0m|    298.931µs|   match|[44m GET     [0m /js/jquery.min.js
+2017/03/26 19:46:11 [D] [server.go:2081] |      127.0.0.1|[47m 304 [0m|   3.941661ms|   match|[44m GET     [0m /css/semantic.min.css
+2017/03/26 19:46:11 [D] [server.go:2081] |      127.0.0.1|[47m 304 [0m|   4.201783ms|   match|[44m GET     [0m /js/vue.js
+2017/03/26 19:46:11 [D] [server.go:2081] |      127.0.0.1|[47m 304 [0m|   5.174684ms|   match|[44m GET     [0m /js/semantic.min.js
+2017/03/26 19:46:11 [D] [server.go:2081] |      127.0.0.1|[47m 304 [0m|   5.338562ms|   match|[44m GET     [0m /js/axios.min.js
+2017/03/26 19:46:11 [D] [server.go:2081] |      127.0.0.1|[47m 304 [0m|    730.561µs|   match|[44m GET     [0m /images/background.jpg
+2017/03/26 19:46:11 [D] [server.go:2081] |      127.0.0.1|[47m 304 [0m|    175.914µs|   match|[44m GET     [0m /css/themes/default/assets/fonts/icons.woff2
+2017/03/26 19:46:11 [D] [server.go:2081] |      127.0.0.1|[43m 404 [0m|    486.339µs| nomatch|[44m GET     [0m /favicon.ico
+2017/03/26 19:46:14 [D] [server.go:2081] |      127.0.0.1|[42m 200 [0m|    538.276µs|   match|[44m GET     [0m /message/login   r:/message/login
+2017/03/26 19:46:14 [D] [server.go:2081] |      127.0.0.1|[42m 200 [0m|   3.848336ms|   match|[44m GET     [0m /teacher   r:/teacher
+2017/03/26 19:46:14 [D] [server.go:2081] |      127.0.0.1|[47m 304 [0m|    357.662µs|   match|[44m GET     [0m /images/logo.png
+2017/03/26 19:46:14 [D] [server.go:2081] |      127.0.0.1|[42m 200 [0m|    908.104µs|   match|[44m GET     [0m /message/teacher/activities   r:/message/teacher/activities
+2017/03/26 19:46:14 [D] [server.go:2081] |      127.0.0.1|[42m 200 [0m|    914.448µs|   match|[44m GET     [0m /message/teacher/activity   r:/message/teacher/activity
+2017/03/26 19:46:16 [D] [server.go:2081] |      127.0.0.1|[42m 200 [0m|    521.886µs|   match|[44m GET     [0m /message/teacher/activity   r:/message/teacher/activity
+2017/03/26 19:46:19 [D] [controller.go:252] parse template err: check.html template: check.html:19: unexpected "<" in command
+2017/03/26 19:46:19 [C] [asm_amd64.s:472] the request url is  /check
+2017/03/26 19:46:19 [C] [asm_amd64.s:472] Handler crashed with error can't find templatefile in the path:views/check.html
+2017/03/26 19:46:19 [C] [asm_amd64.s:472] /usr/lib/go-1.6/src/runtime/asm_amd64.s:472
+2017/03/26 19:46:19 [C] [asm_amd64.s:472] /usr/lib/go-1.6/src/runtime/panic.go:443
+2017/03/26 19:46:19 [C] [asm_amd64.s:472] /home/zekin/mygo/src/github.com/astaxie/beego/template.go:73
+2017/03/26 19:46:19 [C] [asm_amd64.s:472] /home/zekin/mygo/src/github.com/astaxie/beego/controller.go:254
+2017/03/26 19:46:19 [C] [asm_amd64.s:472] /home/zekin/mygo/src/github.com/astaxie/beego/controller.go:205
+2017/03/26 19:46:19 [C] [asm_amd64.s:472] /home/zekin/mygo/src/github.com/astaxie/beego/controller.go:185
+2017/03/26 19:46:19 [C] [asm_amd64.s:472] /home/zekin/mygo/src/github.com/astaxie/beego/router.go:816
+2017/03/26 19:46:19 [C] [asm_amd64.s:472] /usr/lib/go-1.6/src/net/http/server.go:2081
+2017/03/26 19:46:19 [C] [asm_amd64.s:472] /usr/lib/go-1.6/src/net/http/server.go:1472
+2017/03/26 19:46:19 [C] [asm_amd64.s:472] /usr/lib/go-1.6/src/runtime/asm_amd64.s:1998
