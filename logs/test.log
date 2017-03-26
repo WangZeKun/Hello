@@ -2678,6 +2678,7 @@
 2017/03/16 17:38:14 [I] [asm_amd64.s:2184] http server Running on http://:8080
 2017/03/16 17:38:14 [I] [asm_amd64.s:2184] http server Running on http://:8080
 2017/03/16 17:38:14 [C] [asm_amd64.s:2184] ListenAndServe:  listen tcp :8080: bind: address already in use
+<<<<<<< HEAD
 2017/03/26 16:43:18 [I] [asm_amd64.s:1998] http server Running on http://:8080
 2017/03/26 16:44:16 [D] [server.go:2081] |      127.0.0.1|[47m 302 [0m|     75.001µs|   match|[44m GET     [0m /     r:/
 2017/03/26 16:44:16 [D] [server.go:2081] |      127.0.0.1|[42m 200 [0m|   1.140594ms|   match|[44m GET     [0m /login   r:/login
@@ -3180,3 +3181,8 @@
 2017/03/26 19:15:16 [D] [server.go:2081] |      127.0.0.1|[42m 200 [0m|   1.957203ms|   match|[44m GET     [0m /message/teacher/activity   r:/message/teacher/activity
 2017/03/26 19:15:58 [I] [asm_amd64.s:1998] http server Running on http://:8080
 2017/03/26 19:16:27 [I] [asm_amd64.s:1998] http server Running on http://:8080
+=======
+>>>>>>> 43513e4369c5439dff85095b6699b256672d8b0d
+2017/03/26 19:44:18 [D] [template.go:171] parse template err: check.html template: check.html:19: unexpected "<" in command
+2017/03/26 19:44:18 [D] [template.go:171] parse template err: collect.html template: collect.html:26: unexpected "<" in command
+2017/03/26 19:44:18 [I] [asm_amd64.s:1998] http server Running on http://:8080

@@ -6,11 +6,11 @@ import (
 
 //用来存储学生信息
 type Student struct {
-	Id        string `orm:"pk"`
-	Name      string
-	Gender    string `orm:"size(1)"`
-	Grade     string `orm:"size(3)"`
-	Class     string `orm:"size(3)"`
+	Id     string `orm:"pk"`
+	Name   string
+	Gender string `orm:"size(1)"`
+	Grade  string `orm:"size(3)"`
+	Class  string `orm:"size(3)"`
 }
 
 type Teacher struct {

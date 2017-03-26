@@ -30,7 +30,6 @@ func (c *MainController) Get() {
 }
 
 
-
 func (c *MainController) GetCanjia() {
 	sess := c.GetSession("username")
 	stu := models.Student{Id: sess.(string)}
