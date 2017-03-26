@@ -3215,3 +3215,6 @@
 2017/03/26 19:46:19 [C] [asm_amd64.s:472] /usr/lib/go-1.6/src/net/http/server.go:1472
 2017/03/26 19:46:19 [C] [asm_amd64.s:472] /usr/lib/go-1.6/src/runtime/asm_amd64.s:1998
 2017/03/26 19:47:15 [D] [server.go:2081] |      127.0.0.1|[42m 200 [0m|   1.380371ms|   match|[44m GET     [0m /check   r:/check
+2017/03/26 19:50:24 [I] [asm_amd64.s:1998] http server Running on http://:8080
+2017/03/26 19:51:02 [I] [asm_amd64.s:1998] http server Running on http://:8080
+2017/03/26 19:51:15 [I] [asm_amd64.s:1998] http server Running on http://:8080
