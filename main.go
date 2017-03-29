@@ -44,7 +44,7 @@ func main() {
 	beego.SetStaticPath("/images", "views/image")
 	beego.SetStaticPath("/js", "views/js")
 	beego.SetStaticPath("/fonts", "views/fonts")
-	beego.SetStaticPath("/favicon.ico", "logo.ico")
+	beego.SetStaticPath("/favicon.ico", "views/image/favicon.ico")
 	beego.SetLogger("file", `{"filename":"logs/test.log"}`)
 	beego.InsertFilter("/teacher", beego.BeforeRouter, FilterTeacher)
 	beego.InsertFilter("/student", beego.BeforeRouter, FilterStudent)
