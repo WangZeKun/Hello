@@ -29,7 +29,6 @@ func (c *MainController) Get() {
 	c.TplName = "student.html"
 }
 
-
 func (c *MainController) GetCanjia() {
 	sess := c.GetSession("username")
 	stu := models.Student{Id: sess.(string)}
@@ -38,7 +37,7 @@ func (c *MainController) GetCanjia() {
 		beego.Error(err)
 		c.Abort("500")
 	}
-	c.Data["json"] = j
+	c.Data["json"] = models.SendMessage("成功！", j)
 	c.ServeJSON()
 }
 
@@ -48,7 +47,7 @@ func (c *MainController) GetRootActivity() {
 		beego.Error(err)
 		c.Abort("500")
 	}
-	c.Data["json"] = data
+	c.Data["json"] = models.SendMessage("成功！", data)
 	c.ServeJSON()
 }
 
@@ -61,7 +60,7 @@ func (c *MainController) GetClassActivity() {
 		c.Abort("500")
 	}
 	data, err := models.ShowActivities(class)
-	c.Data["json"] = data
+	c.Data["json"] = models.SendMessage("成功！", data)
 	c.ServeJSON()
 }
 
@@ -74,7 +73,7 @@ func (c *MainController) GetGradeActivity() {
 		c.Abort("500")
 	}
 	data, err := models.ShowActivities(grade)
-	c.Data["json"] = data
+	c.Data["json"] = models.SendMessage("成功！", data)
 	c.ServeJSON()
 }
 
@@ -94,7 +93,7 @@ func (c *MainController) SetJion() {
 	jion := models.Jion{ActivityId: c.GetString("activity_id"), StudentId: sess.(string)}
 	b := jion.Check()
 	if b {
-		c.Data["json"] = "您已经报过名了！"
+		c.Data["json"] = models.SendMessage("您已经报过名了！", nil)
 	} else {
 		jion.Status = "审核中"
 		jion.Date = time.Now()
@@ -103,7 +102,7 @@ func (c *MainController) SetJion() {
 			beego.Error(err)
 			c.Abort("500")
 		}
-		c.Data["json"] = "报名成功！"
+		c.Data["json"] = models.SendMessage("报名成功！", nil)
 	}
 	c.ServeJSON()
 }
@@ -125,7 +124,7 @@ func (c *MainController) Change() {
 			beego.Error(err)
 			c.Abort("500")
 		}
-		c.Data["json"] = "修改成功"
+		c.Data["json"] = models.SendMessage("修改成功", nil)
 	}
 	c.ServeJSON()
 }

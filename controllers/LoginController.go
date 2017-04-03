@@ -22,19 +22,19 @@ func (c *LoginController) Post() {
 	user := models.Login{Username: c.GetString("username")}
 	b := user.Check(c.GetString("password"))
 	if !b {
-		c.Data["json"] = "密码错误！"
+		c.Data["json"] = models.SendMessage("密码错误！", nil)
 		c.ServeJSON()
 	} else {
 		if c.GetString("select") == "学生登陆" && user.Who == "student" {
-			c.Data["json"] = "success student"
+			c.Data["json"] = models.SendMessage("成功，学生登录！", nil)
 			c.SetSession("username", user.Username)
 			c.SetSession("select", user.Who)
 		} else if c.GetString("select") == "教师登陆" && user.Who == "teacher" {
-			c.Data["json"] = "success teacher"
+			c.Data["json"] = models.SendMessage("成功，教师登录！", nil)
 			c.SetSession("username", user.Username)
 			c.SetSession("select", user.Who)
 		} else {
-			c.Data["json"] = "pleace choose user type"
+			c.Data["json"] = models.SendMessage("请选择正确的登录用户！", nil)
 		}
 		c.ServeJSON()
 		//c.Ctx.WriteString(str(err))
