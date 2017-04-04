@@ -90,14 +90,14 @@
                         }
                     })
                     .then(response => {
-                        if (response.data.message == "成功，学生登录！") {
+                        if (response.data.Message == "成功，学生登录！") {
                             self.location = '/student'
                             return
-                        } else if (response.data.message == "成功，教师登录！") {
+                        } else if (response.data.Message == "成功，教师登录！") {
                             self.location = "/teacher"
                             return
                         }
-                        this.message = response.data.message;
+                        this.message = response.data.Message;
                     })
                     .catch(error => {
                         console.log(error)

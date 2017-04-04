@@ -11,6 +11,7 @@ func init() {
 	beego.Router("/login", &controllers.LoginController{})
 	beego.Router("/message/login", &controllers.LoginController{}, "get:Post")
 	beego.Router("/student", &controllers.MainController{})
+	beego.Router("/message/student",&controllers.MainController{},"get:GetStudentMessage")
 	beego.Router("/message/student/canjia", &controllers.MainController{}, "get:GetCanjia")
 	beego.Router("/message/student/root", &controllers.MainController{}, "get:GetRootActivity")
 	beego.Router("/message/student/class", &controllers.MainController{}, "get:GetClassActivity")

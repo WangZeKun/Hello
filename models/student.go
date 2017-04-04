@@ -48,7 +48,7 @@ func (s *Student) Read() (err error) {
 
 func (s *Student) ShowWhatJion() (data []OutStudentJion, err error) {
 	o := orm.NewOrm()
-	_, err = o.Raw("select j.id,a.name,j.date,j.status from jion j,activity a where j.activity_id = a.id and j.student_id = ?", s.Id).QueryRows(&data)
+	_, err = o.Raw("select j.id,a.name,j.date,j.status,a.who_build from jion j,activity a where j.activity_id = a.id and j.student_id = ?", s.Id).QueryRows(&data)
 	return
 }
 

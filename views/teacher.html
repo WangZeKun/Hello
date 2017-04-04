@@ -264,14 +264,17 @@
             getActivities: function() {
                 axios.get(getaurl)
                     .then(response => {
-                        this.activitie = response.data;
-                        end.activities = this.activitie;
-                        addStu.activities = this.activitie;
-                        this.activity = this.activitie[0];
-                        this.isActive = this.activity.Id;
-                        this.getActivity();
+                        if(response.data.Message === "成功！"){
+                            this.activitie = response.data.Data;
+                            end.activities = this.activitie;
+                            addStu.activities = this.activitie;
+                            this.activity = this.activitie[0];
+                            this.isActive = this.activity.Id;
+                            this.getActivity();
+                        }
                     }).catch(function(error) {
                         console.log(error);
+                        
                     });
             },
 
@@ -282,7 +285,9 @@
                         }
                     })
                     .then(response => {
-                        this.jions = response.data
+                        if(response.data.Message === "成功！"){
+                            this.jions = response.data.Data
+                        }
                     })
                     .catch(function(error) {
                         console.log(error);
@@ -296,8 +301,9 @@
                         }
                     })
                     .then(response => {
-                        this.getActivity();
-
+                        if(response.data.Message === "成功！"){
+                            this.getActivity();
+                        }
                     })
                     .catch(function(error) {
                         console.log(error);
@@ -310,8 +316,10 @@
                         }
                     })
                     .then(response => {
-                        this.getActivities();
-                        $('#table').dimmer('hide');
+                        if(response.data.Message === "成功！"){
+                            this.getActivities();
+                            $('#table').dimmer('hide');
+                        }
                     })
                     .catch(function(error) {
                         console.log(error);
@@ -370,7 +378,9 @@
                         }
                     })
                     .then(response => {
-                        activities.getActivities();
+                        if(response.data.Message === "成功！"){
+                            activities.getActivities();
+                        }
                     })
                     .catch(function(error) {
                         console.log(error);
@@ -379,6 +389,7 @@
                 this.Name = '';
                 this.message = '';
                 this.Introduction = "";
+                this.date = '';
             }
         }
 
@@ -434,7 +445,9 @@
                         id: "" + this.selected
                     })
                     .then(response => {
-                        activities.getActivities();
+                        if (response.data.Message === "成功！"){
+                            activities.getActivities();
+                        }
                     })
                     .catch(function(error) {
                         console.log(error);
@@ -493,7 +506,9 @@
                         }
                     })
                     .then(response => {
-                        this.classes = response.data;
+                        if (response.data.Message === "成功！"){
+                            this.classes = response.data;
+                        }
                     })
                     .catch(function(error) {
                         console.log(error)
@@ -507,7 +522,9 @@
                         }
                     })
                     .then(response => {
-                        this.student = response.data;
+                        if (response.data.Message === "成功！"){
+                            this.student = response.data;
+                        }
                     })
                     .catch(function(error) {
                         console.log(error)
@@ -528,7 +545,9 @@
                         }
                     })
                     .then(response => {
-                        activities.getActivity();
+                        if (response.data.Message === "成功！"){
+                            activities.getActivity();
+                        }
                     })
                     .catch(function(error) {
                         console.log(error)

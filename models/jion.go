@@ -29,6 +29,7 @@ type OutStudentJion struct {
 	Date   string
 	Name   string
 	Status string
+	WhoBuild string
 }
 
 //得到时间

@@ -36,7 +36,7 @@ func (c *TeacherController) Add() {
 		beego.Error(err)
 		c.Abort("500")
 	}
-	c.Data["json"] = models.SendMessage("成功！", nil)
+	c.Data["json"] = sendMessage("成功！", nil)
 	c.ServeJSON()
 }
 
@@ -71,7 +71,7 @@ func (c *TeacherController) Accept() {
 		beego.Error(err)
 		c.Abort("500")
 	}
-	c.Data["json"] = models.SendMessage("成功！", nil)
+	c.Data["json"] = sendMessage("成功！", nil)
 	c.ServeJSON()
 }
 
@@ -88,7 +88,7 @@ func (c *TeacherController) AddStu() {
 		beego.Error("err")
 		c.Abort("500")
 	}
-	c.Data["json"] = models.SendMessage("成功！", nil)
+	c.Data["json"] = sendMessage("成功！", nil)
 	c.ServeJSON()
 }
 
@@ -99,7 +99,7 @@ func (c *TeacherController) GetActivties() {
 		c.Abort("500")
 	}
 
-	c.Data["json"] = models.SendMessage("成功！", activities)
+	c.Data["json"] = sendMessage("成功！", activities)
 	c.ServeJSON()
 }
 
@@ -115,7 +115,7 @@ func (c *TeacherController) GetJions() {
 		beego.Error(err)
 		c.Abort("500")
 	}
-	c.Data["json"] = models.SendMessage("成功！", j)
+	c.Data["json"] = sendMessage("成功！", j)
 	c.ServeJSON()
 }
 
@@ -132,7 +132,7 @@ func (c *TeacherController) SetStatus() {
 		beego.Error(err)
 		c.Abort("500")
 	}
-	c.Data["json"] = models.SendMessage("成功！", nil)
+	c.Data["json"] = sendMessage("成功！", nil)
 	c.ServeJSON()
 }
 
@@ -148,7 +148,7 @@ func (c *TeacherController) DelActivity() {
 		beego.Error(err)
 		c.Abort("500")
 	}
-	c.Data["json"] = models.SendMessage("成功！", nil)
+	c.Data["json"] = sendMessage("成功！", nil)
 	c.ServeJSON()
 }
 
@@ -158,7 +158,7 @@ func (c *TeacherController) GetClass() {
 		beego.Error(err)
 		c.Abort("500")
 	}
-	c.Data["json"] = models.SendMessage("成功！", class)
+	c.Data["json"] = sendMessage("成功！", class)
 	c.ServeJSON()
 }
 
@@ -169,7 +169,7 @@ func (c *TeacherController) GetStudent() {
 		c.Abort("500")
 	}
 
-	c.Data["json"] = models.SendMessage("成功！", student)
+	c.Data["json"] = sendMessage("成功！", student)
 	c.ServeJSON()
 	return
 }
