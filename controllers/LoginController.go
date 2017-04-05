@@ -19,6 +19,7 @@ func (c *LoginController) Get() {
 }
 
 func (c *LoginController) Post() {
+	c.Abort("401")
 	user := models.Login{Username: c.GetString("username")}
 	b := user.Check(c.GetString("password"))
 	if !b {
@@ -28,7 +29,7 @@ func (c *LoginController) Post() {
 		if c.GetString("select") == "学生登陆" && user.Who == "student" {
 			c.SetSession("username", user.Username)
 			c.SetSession("select", user.Who)
-			sess:= c.StartSession()
+			sess := c.StartSession()
 			beego.Informational(sess.SessionID())
 			c.Data["json"] = sendMessage("成功，学生登录！", sess.SessionID())
 		} else if c.GetString("select") == "教师登陆" && user.Who == "teacher" {

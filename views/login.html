@@ -14,6 +14,7 @@
     <script src="/js/vue.js"></script>
     <script src="/js/axios.min.js"></script>
     <script src="/js/semantic.min.js"></script>
+    <script src="/js/api.js"></script>
     <link href="/css/semantic.min.css" rel="stylesheet">
     <style type="text/css">
     body {
@@ -100,7 +101,7 @@
                         this.message = response.data.Message;
                     })
                     .catch(error => {
-                        console.log(error)
+                        checkError(error)
                     })
             }
         }
