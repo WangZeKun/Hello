@@ -255,6 +255,7 @@
     let classurl= '/message/teacher/getclass';
     let studenturl= '/message/teacher/getstudent';
     let addstuurl='/message/teacher/addStu';
+    var activity = {activities:[]};
     var activities = new Vue({
         el: '#activities',
         mounted: function() {
@@ -339,12 +340,14 @@
 
         },
         data: function() {
-            return {
+            let a = {
                 activity: {},
                 activitie: [],
                 jions: [],
                 isActive: '',
-            }
+            };
+            Object.assign(a,activity);
+            return a;
 
         }
     })
@@ -398,15 +401,16 @@
     var end = new Vue({
         el: '#end',
         data: function() {
-            return {
+            let a = {
                 score: '',
                 message: '',
                 image: '',
                 images: [],
                 impression: '',
                 selected: '',
-                activities: [],
-            }
+            };
+            Object.assign(a,activity);
+            return a;
         },
         methods: {
             onFileChange(e) {
@@ -465,7 +469,7 @@
     var addStu = new Vue({
         el: '#addStu',
         data: function() {
-            return {
+            let a =  {
                 grade: ['初一', '初二', '初三', '高一', '高二', '高三'],
                 selectGrade: '<<<.teacher.Grade>>>',
                 isGrade: false,
@@ -477,7 +481,9 @@
                 activities: [],
                 selected: '',
                 message: '',
-            }
+            };
+            Object.assign(a,activity);
+            return a;
         },
         mounted: function() {   
             if (this.selectGrade !== ''){
@@ -558,6 +564,7 @@
             }
         }
     })
+    
     </script>
     <script src="/js/semantic.min.js"></script>
     <script type="text/javascript">
