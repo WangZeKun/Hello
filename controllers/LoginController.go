@@ -19,7 +19,6 @@ func (c *LoginController) Get() {
 }
 
 func (c *LoginController) Post() {
-	c.Abort("401")
 	user := models.Login{Username: c.GetString("username")}
 	b := user.Check(c.GetString("password"))
 	if !b {

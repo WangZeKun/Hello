@@ -70,7 +70,6 @@
         </div>
     </div>
     <script>
-    let loginurl = '/message/login'
     var login = new Vue({
         el: '#login',
         data: function() {
@@ -83,7 +82,7 @@
         },
         methods: {
             login: function() {
-                axios.get(loginurl, {
+                axios.get("/message/login", {
                         params: {
                             select: this.select,
                             username: this.username,

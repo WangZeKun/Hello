@@ -120,73 +120,73 @@
     <script src="/js/axios.min.js"></script>
     <script src="/js/semantic.min.js"></script>
     <script type="text/javascript">
-    let rooturl = '/message/student/root';
-    let classurl = '/message/student/class';
-    let gradeurl = '/message/student/grade';
-    let setjionurl = '/message/student/jion';
-    let canjiaurl = '/message/student/canjia';
-    let changerul = '/message/student/change' ;
-    Vue.component('activity', {
-        props: ['message'],
-        mounted: function() {
-            if (this.message === "团委") {
-                this.url = rooturl;
-                this.id = "root";
-            } else if (this.message === "年级") {
-                this.url = gradeurl;
-                this.id = "grade";
-            } else if (this.message === "班级") {
-                this.url = classurl;
-                this.id = "class";
-            }
-            this.getActivities();
-        },
-        data: function() {
-            return {
-                id: '',
-                activities: [],
-                activity: {},
-                isActive: '',
-                mess: '',
-                url: '',
-            }
-        },
-        methods: {
-            setJion: function() {
-                axios.get(setjionurl, {
+        let rooturl = '/message/student/root';
+        let classurl = '/message/student/class';
+        let gradeurl = '/message/student/grade';
+        let setjionurl = '/message/student/jion';
+        let canjiaurl = '/message/student/canjia';
+        let changerul = '/message/student/change';
+        Vue.component('activity', {
+            props: ['message'],
+            mounted: function () {
+                if (this.message === "团委") {
+                    this.url = rooturl;
+                    this.id = "root";
+                } else if (this.message === "年级") {
+                    this.url = gradeurl;
+                    this.id = "grade";
+                } else if (this.message === "班级") {
+                    this.url = classurl;
+                    this.id = "class";
+                }
+                this.getActivities();
+            },
+            data: function () {
+                return {
+                    id: '',
+                    activities: [],
+                    activity: {},
+                    isActive: '',
+                    mess: '',
+                    url: '',
+                }
+            },
+            methods: {
+                setJion: function () {
+                    axios.get(setjionurl, {
                         params: {
                             activity_id: this.activity.Id,
                         }
                     })
-                    .then(response => {
-                        this.mess = response.data;
-                        $('#' + this.id).dimmer('show');
-                        activity.getCanjia();
-                    })
-                    .catch(error => {
-                        console.log(error)
-                    })
+                        .then(response => {
+                            this.mess = response.data;
+                            $('#' + this.id).dimmer('show');
+                            activity.getCanjia();
+                        })
+                        .catch(error => {
+                            checkError(error);
+                        })
+                },
+                getActivities: function () {
+                    axios.get(this.url)
+                        .then(response => {
+                            this.activities = response.data;
+                            if (this.activities.length !== 0) {
+                                this.activity = this.activities[0];
+                                this.isActive = this.activity.Id
+                            }
+                        }).catch(function (error) {
+                            checkError(error);
+                        });
+                },
+                active: function (a) {
+                    if (this.isActive !== a.Id) {
+                        this.isActive = a.Id;
+                        this.activity = a;
+                    }
+                },
             },
-            getActivities: function() {
-                axios.get(this.url)
-                    .then(response => {
-                        this.activities = response.data;
-                        if (this.activities.length !== 0) {
-                            this.activity = this.activities[0];
-                            this.isActive = this.activity.Id
-                        }
-                    }).catch(function(error) {
-                        console.log(error);
-                    });
-            },
-            active: function(a) {
-                if (this.isActive !== a.Id) {
-                    this.isActive = a.Id;
-                    this.activity = a;
-                }
-            },
-        },
-        template: `
+            template: `
         <div class="ui container">
                 <h2 class="ui header">{{message}}活动：</h2>
             <div v-if="activities.length!==0" v-bind:id="id">
@@ -218,84 +218,84 @@
             <br>
             <br>
         </div>`
-    })
+        })
 
-    var activity = new Vue({
-        el: '#activity',
-        mounted: function() {
-            this.getCanjia();
+        var activity = new Vue({
+            el: '#activity',
+            mounted: function () {
+                this.getCanjia();
 
-        },
-        data: function() {
-            return {
-                canjia: [],
-            }
-        },
-        methods: {
-            getCanjia: function() {
-                axios.get(canjiaurl)
-                    .then(response => {
-                        this.canjia = response.data
-                    })
-                    .catch(error => {
-                        console.log(error)
-                    })
             },
-        }
-    })
-
-    var change = new Vue({
-        el: '#change',
-        data: function() {
-            return {
-                password: '',
-                newpassword: '',
-                repeatpassword: '',
-                message: '',
-            }
-        },
-        methods: {
-            change: function() {
-                if (this.password === '') {
-                    this.message = "请输入原密码！"
-                } else if (this.newpassword.length < 6) {
-                    this.message = '请输入6位以上的密码！'
-                } else if (this.newpassword !== this.repeatpassword) {
-                    this.message = '两次输入密码不正确！';
-                    return;
+            data: function () {
+                return {
+                    canjia: [],
                 }
-                axios.get(changerul, {
+            },
+            methods: {
+                getCanjia: function () {
+                    axios.get(canjiaurl)
+                        .then(response => {
+                            this.canjia = response.data
+                        })
+                        .catch(error => {
+                            checkError(error);
+                        })
+                },
+            }
+        })
+
+        var change = new Vue({
+            el: '#change',
+            data: function () {
+                return {
+                    password: '',
+                    newpassword: '',
+                    repeatpassword: '',
+                    message: '',
+                }
+            },
+            methods: {
+                change: function () {
+                    if (this.password === '') {
+                        this.message = "请输入原密码！"
+                    } else if (this.newpassword.length < 6) {
+                        this.message = '请输入6位以上的密码！'
+                    } else if (this.newpassword !== this.repeatpassword) {
+                        this.message = '两次输入密码不正确！';
+                        return;
+                    }
+                    axios.get(changerul, {
                         params: {
                             password: this.password,
                             newpassword: this.newpassword,
                         }
                     })
-                    .then(response => {
-                        if (response.data === "修改成功") {
-                            $('#change').modal("hide");
-                            this.message = ''
-                        } else {
-                            this.message = response.data;
-                        }
-                    })
-                    .catch(error => {
-                        console.log(error)
-                    })
+                        .then(response => {
+                            if (response.data === "修改成功") {
+                                $('#change').modal("hide");
+                                this.message = ''
+                            } else {
+                                this.message = response.data;
+                            }
+                        })
+                        .catch(error => {
+                            checkError(error);
+                        })
+                }
             }
-        }
-    })
+        })
     </script>
     <script type="text/javascript">
-    function changemodal() {
-        $('#change').modal({
+        function changemodal() {
+            $('#change').modal({
                 closable: false,
-                onApprove: function() {
+                onApprove: function () {
                     change.change();
                     return false;
                 }
             })
-            .modal('show')
-    }
+                .modal('show')
+        }
     </script>
 </body>
 

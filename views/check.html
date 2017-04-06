@@ -72,55 +72,55 @@
         <script src="/js/vue.js"></script>
         <script src="/js/axios.min.js"></script>
         <script>
-        let classurl = '/message/teacher/getclass';
-        let checkurl = '/message/teacher/score';
-        var check = new Vue({
-            el: '#check',
-            data: function() {
-                return {
-                    grade: ['初一', '初二', '初三', '高一', '高二', '高三'],
-                    selectGrade: '',
-                    classes: [],
-                    students: [],
-                    selectClass: '',
-                }
-            },
-            methods: {
-                checkClass: function() {
-                    axios.get(classurl, {
+            let classurl = '/message/teacher/getclass';
+            let checkurl = '/message/teacher/score';
+            var check = new Vue({
+                el: '#check',
+                data: function () {
+                    return {
+                        grade: ['初一', '初二', '初三', '高一', '高二', '高三'],
+                        selectGrade: '',
+                        classes: [],
+                        students: [],
+                        selectClass: '',
+                    }
+                },
+                methods: {
+                    checkClass: function () {
+                        axios.get(classurl, {
                             params: {
                                 grade: this.selectGrade,
                             }
                         })
-                        .then(response => {
-                            this.classes = response.data;
-                            this.classes.push("全年级")
-                        })
-                        .catch(function(error) {
-                            console.log(error)
-                        })
-                },
-                checkStudent: function() {
-                    if (this.selectClass === "全年级"){
-                        this.selectClass = "";
-                    }
-                    axios.get(checkurl, {
+                            .then(response => {
+                                this.classes = response.data;
+                                this.classes.push("全年级")
+                            })
+                            .catch(function (error) {
+                                checkError(error);
+                            })
+                    },
+                    checkStudent: function () {
+                        if (this.selectClass === "全年级") {
+                            this.selectClass = "";
+                        }
+                        axios.get(checkurl, {
                             params: {
                                 grade: this.selectGrade,
                                 class: this.selectClass,
                             }
                         })
-                        .then(response => {
-                            this.students = response.data;
-                        })
-                        .catch(function(error) {
-                            console.log(error);
-                        })
-                },
-            }
-        })
-        $('select.dropdown')
-            .dropdown();
+                            .then(response => {
+                                this.students = response.data;
+                            })
+                            .catch(function (error) {
+                                checkError(error);
+                            })
+                    },
+                }
+            })
+            $('select.dropdown')
+                .dropdown();
         </script>
 </body>
 

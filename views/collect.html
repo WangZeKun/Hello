@@ -9,6 +9,9 @@
     <title>北京市广渠门中学志愿活动管理</title>
     <!-- Bootstrap -->
     <link href="/css/semantic.min.css" rel="stylesheet">
+    <script src="/js/api.js">
+
+    </script>
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -45,7 +48,8 @@
             <div class="twelve wide stretched column">
                 <table class="ui green table">
                     <caption>
-                        <h3 class="ui header">发起人： {{ activity.WhoBuild }} 所得工时：{{ activity.Score}}</h3></caption>
+                        <h3 class="ui header">发起人： {{ activity.WhoBuild }} 所得工时：{{ activity.Score}}</h3>
+                    </caption>
                     <thead>
                         <tr>
                             <th>#</th>
@@ -84,59 +88,59 @@
     <script src="/js/vue.js"></script>
     <script src="/js/axios.min.js"></script>
     <script>
-    let getactivitiesurl = '/message/teacher/Cactivities';
-    let getactivityurl = '/message/teacher/Cactivity';
-    var activities = new Vue({
-        el: '#activities',
-        mounted: function() {
-            this.getActivities()
-        },
-        methods: {
-            getActivities: function() {
-                axios.get(getactivitiesurl)
-                    .then(response => {
-                        this.activitie = response.data;
-                        this.activity = this.activitie[0]
-                        this.isActive = this.activity.Id
-                        this.getActivity();
-                    }).catch(function(error) {
-                        console.log(error);
-                    });
+        let getactivitiesurl = '/message/teacher/Cactivities';
+        let getactivityurl = '/message/teacher/Cactivity';
+        var activities = new Vue({
+            el: '#activities',
+            mounted: function () {
+                this.getActivities()
             },
-            getActivity: function() {
-                axios.get(getactivityurl, {
+            methods: {
+                getActivities: function () {
+                    axios.get(getactivitiesurl)
+                        .then(response => {
+                            this.activitie = response.data;
+                            this.activity = this.activitie[0]
+                            this.isActive = this.activity.Id
+                            this.getActivity();
+                        }).catch(function (error) {
+                            checkError(error);
+                        });
+                },
+                getActivity: function () {
+                    axios.get(getactivityurl, {
                         params: {
                             id: this.activity.Id
                         }
                     })
-                    .then(response => {
-                        this.jions = response.data;
-                        this.image = JSON.parse(this.activity.ImagePath);
-                    })
-                    .catch(function(error) {
-                        console.log(error);
-                    });
+                        .then(response => {
+                            this.jions = response.data;
+                            this.image = JSON.parse(this.activity.ImagePath);
+                        })
+                        .catch(function (error) {
+                            checkError(error);
+                        });
+                },
+                active: function (a) {
+                    if (this.isActive !== a.Id) {
+                        this.isActive = a.Id;
+                        this.activity = a;
+                        this.getActivity();
+                    }
+
+                },
             },
-            active: function(a) {
-                if (this.isActive !== a.Id) {
-                    this.isActive = a.Id;
-                    this.activity = a;
-                    this.getActivity();
+            data: function () {
+                return {
+                    activitie: [],
+                    activity: {},
+                    jions: [],
+                    image: [],
+                    isActive: '',
                 }
 
-            },
-        },
-        data: function() {
-            return {
-                activitie: [],
-                activity: {},
-                jions: [],
-                image: [],
-                isActive: '',
             }
-
-        }
-    })
+        })
     </script>
 </body>
 
