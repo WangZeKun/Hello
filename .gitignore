@@ -2,3 +2,5 @@ tests/
 logs/
 .vscode/
 hello*
+.idea
+views/.idea

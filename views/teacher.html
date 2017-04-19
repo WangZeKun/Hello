@@ -1,28 +1,27 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>北京市广渠门中学志愿活动管理</title>
-    <link href="/css/semantic.min.css" rel="stylesheet">
+    <link href="css/semantic.min.css" rel="stylesheet">
 
 </head>
 
 <body>
     <div class="ui violet inverted top fixed menu">
         <div class="item">
-            <img src="/images/logo.png">
+            <img src="image/logo.png">
         </div>
-        <a class="item">北京市广渠门中心志愿活动管理</a>
+        <a class="item">北京市广渠门中学志愿活动管理</a>
         <a class="item" href="/end">已结束活动</a>
         <a class="item" href="/check">学分查询</a>
         <div class="right menu" style="padding-right: 20px">
             <a class="item" onclick="addmodal()">添加活动</a>
             <a class="item" onclick="addStumodal()">添加学生</a>
             <a class="item" onclick="endmodal()">结束活动</a>
-            <a class="item" href="/exit">退出登录</a>
+            <a class="item" href="/message/exit">退出登录</a>
         </div>
     </div>
     <br />
@@ -47,6 +46,7 @@
                         <th>班级</th>
                         <th>姓名</th>
                         <th>状态</th>
+                        <th v-if="activity.Message.length !== 0" v-for="i of activity.Message">{{i}}</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -60,6 +60,7 @@
                         <td>{{jion.Class}}</td>
                         <td>{{jion.Name}}</td>
                         <td>{{jion.Status}}</td>
+                        <td v-for="i of jion.Message">{{i}}</td>
                         <td>
                             <div class="ui buttons">
                                 <button class="ui pink button" @click="setStatus(jion.Id,'审核通过')">通过</button>
@@ -145,6 +146,17 @@
                 <label>活动简介:</label>
                 <textarea rows="6" v-model="Introduction"></textarea>
             </div>
+            <div class="ui segment">
+                <div v-for="m in Message" class="ui label button pink" @click="delMessage(m)">
+                    {{m}}
+                    <i class="remove icon"></i>
+                </div>
+            </div>
+            <div class="inline field">
+                <label>添加信息：</label>
+                <input v-model="m">
+                <button class="ui button primary" @click="addMessage">确定</button>
+            </div>
         </div>
         <div class="actions">
             <div class="ui black deny button">
@@ -228,43 +240,221 @@
     <br>
     <br>
     <br>
-    </div>
-    </div>
     <script src="/js/jquery.min.js"></script>
     <script src="/js/vue.js"></script>
     <script src="/js/axios.min.js"></script>
-    <script src="/js/api.js"></script>
+    <script src="/js/Api/api.js"></script>
+    <script>
+        function check(date) {
+            let result = date.match(/((^((1[8-9]\d{2})|([2-9]\d{3}))(-)(10|12|0?[13578])(-)(3[01]|[12][0-9]|0?[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(-)(11|0?[469])(-)(30|[12][0-9]|0?[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))(-)(0?2)(-)(2[0-8]|1[0-9]|0?[1-9])$)|(^([2468][048]00)(-)(0?2)(-)(29)$)|(^([3579][26]00)(-)(0?2)(-)(29)$)|(^([1][89][0][48])(-)(0?2)(-)(29)$)|(^([2-9][0-9][0][48])(-)(0?2)(-)(29)$)|(^([1][89][2468][048])(-)(0?2)(-)(29)$)|(^([2-9][0-9][2468][048])(-)(0?2)(-)(29)$)|(^([1][89][13579][26])(-)(0?2)(-)(29)$)|(^([2-9][0-9][13579][26])(-)(0?2)(-)(29)$))/);
+            return result !== null;
+        }
+    </script>
     <script type="text/javascript">
-    let getaurl='/message/teacher/activities';
-    let geturl= '/message/teacher/activity';
-    let seturl= '/message/teacher/set';
-    let delurl= '/message/teacher/del';
-    let addurl= '/message/teacher/add';
-    let endurl= '/message/teacher/accept';
-    let classurl= '/message/teacher/getclass';
-    let studenturl= '/message/teacher/getstudent';
-    let addstuurl='/message/teacher/addStu';
-    var activity = {activities:[]};
-    var activities = new Vue({
+    const getaurl='/message/teacher/activities';
+    const geturl= '/message/teacher/activity';
+    const seturl= '/message/teacher/set';
+    const delurl= '/message/teacher/del';
+    const addurl= '/message/teacher/add';
+    const endurl= '/message/teacher/accept';
+    const classurl= '/message/teacher/getclass';
+    const studenturl= '/message/teacher/getstudent';
+    const addstuurl='/message/teacher/addStu';
+    let end = new Vue({
+        el: '#end',
+        data: function() {
+            return {
+                score: '',
+                message: '',
+                image: '',
+                images: [],
+                impression: '',
+                selected: '',
+                activities:[],
+            }
+        },
+        methods: {
+            onFileChange(e) {
+                let files = e.target.files || e.dataTransfer.files;
+                this.images = [];
+                if (!files.length)
+                    return;
+                for (let i = 0; i < files.length; i++) {
+                    this.createImage(files[i]);
+                }
+            },
+            createImage(file) {
+                let reader = new FileReader();
+
+                reader.onload = (e) => {
+                    this.images.push(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            },
+            endActvities: function() {
+                if (this.selected === '') {
+                    this.message = "请输入选择活动！";
+                    return
+                } else if (this.score === '') {
+                    this.message = "请输入获得工时！";
+                    return
+                } else if (this.impression === '') {
+                    this.message = "请输入活动感受！";
+                    return
+                }
+                let params = new URLSearchParams();
+                params.append("img",JSON.stringify(this.images));
+                params.append("impression",this.impression);
+                params.append("score",this.score);
+                params.append("id","" + this.selected);
+                axios.post(endurl, params)
+                    .then(response => {
+                        if (response.data.Message === "成功！"){
+                            activities.getActivities();
+                        }
+                    })
+                    .catch(function(error) {
+                        checkError(error);
+                    });
+                $('#end').modal('hide');
+                this.impression = '';
+                this.score = '';
+                this.selected = '';
+                this.images = [];
+                this.message = '';
+            }
+        }
+    });
+    let addStu = new Vue({
+        el: '#addStu',
+        data: function () {
+            return {
+                grade: ['初一', '初二', '初三', '高一', '高二', '高三'],
+                selectGrade: '<<<.teacher.Grade>>>',
+                isGrade: false,
+                classes: [],
+                selectClass: '<<<.teacher.Class>>>',
+                isClass: false,
+                student: [],
+                selectStudent: '',
+                activities: [],
+                selected: '',
+                message: '',
+            };
+        },
+        mounted: function () {
+            if (this.selectGrade !== '') {
+                if (this.selectClass !== '') {
+                    this.checkStudent();
+                } else {
+                    this.checkClass()
+                }
+            }
+
+        },
+        methods: {
+            clear: function () {
+                this.selectGrade = '';
+                this.classes = [];
+                this.selectClass = '';
+                this.student = [];
+                this.selectStudent = '';
+                this.selected = '';
+                this.message = '';
+            },
+            checkClass: function () {
+                axios.get(classurl, {
+                    params: {
+                        grade: this.selectGrade,
+                    }
+                })
+                    .then(response => {
+                        if (response.data.Message === "成功！") {
+                            this.classes = response.data.Data;
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error)
+                    })
+            },
+            checkStudent: function () {
+                axios.get(studenturl, {
+                    params: {
+                        grade: this.selectGrade,
+                        class: this.selectClass,
+                    }
+                })
+                    .then(response => {
+                        if (response.data.Message === "成功！") {
+                            this.selectStudent = '';
+                            this.student = response.data.Data;
+
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error)
+                    })
+            },
+            addstu: function () {
+                if (this.selected === "") {
+                    this.message = "请选择活动！";
+                    return
+                } else if (this.selectStudent === "") {
+                    this.message = "请选择添加的同学！";
+                    return
+                }
+                axios.get(addstuurl, {
+                    params: {
+                        name: this.selectStudent,
+                        activityId: this.selected,
+                    }
+                })
+                    .then(response => {
+                        if (response.data.Message === "成功！") {
+                            activities.getActivity();
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error)
+                    })
+
+                $('#addStu').modal('hide');
+                this.clear();
+            }
+        }
+    });
+    let activities = new Vue({
         el: '#activities',
         mounted: function() {
             this.getActivities()
         },
         methods: {
             getActivities: function() {
-                axios.get(getaurl)
+                axios.get(getaurl,{
+                    params:{
+                        status:"now",
+                    }
+                })
                     .then(response => {
                         if(response.data.Message === "成功！"){
                             this.activitie = response.data.Data;
-                            end.activities = this.activitie;
-                            addStu.activities = this.activitie;
                             this.activity = this.activitie[0];
                             this.isActive = this.activity.Id;
+                            for(let i = 0;i<this.activitie.length;i++){
+                                this.activitie[i].Message = JSON.parse(this.activitie[i].Message);
+                            }
                             this.getActivity();
+                            end.activities = this.activitie;
+                            for (let i = 0; i < this.activitie.length; i++) {
+                                if (this.activitie[i].Message.length === 0) {
+                                    addStu.activities.push(this.activitie[i]);
+                                }
+
+                            }
                         }
                     }).catch(function(error) {
                        checkError(error);
-                        
+
                     });
             },
 
@@ -276,10 +466,18 @@
                     })
                     .then(response => {
                         if(response.data.Message === "成功！"){
-                            this.jions = response.data.Data
+                            this.jions = response.data.Data;
+                            console.log(this.jions);
+                            if (this.jions !== null){
+                                for (let x = 0;x<this.jions.length;x++){
+                                    this.jions[x].Message = JSON.parse(this.jions[x].Message)
+                                }
+                            }
+
                         }
                     })
                     .catch(function(error) {
+                        console.log(error)
                         checkError(error);
                     });
             },
@@ -329,54 +527,67 @@
 
         },
         data: function() {
-            let a = {
+            return {
                 activity: {},
                 activitie: [],
                 jions: [],
                 isActive: '',
-            };
-            Object.assign(a,activity);
-            return a;
+                activities:[],
+            }
 
         }
-    })
-
-    var add = new Vue({
+    });
+    let add = new Vue({
         el: '#add',
         data: {
             Name: '',
             Introduction: '',
             message: '',
-            date:'',
-
+            date: '',
+            Message:[],
+            m:'',
         },
         methods: {
-            addActivities: function() {
+            addMessage:function(){
+                this.Message.push(this.m);
+                console.log(123456)
+            },
+
+            delMessage:function(message){
+                let index = this.Message.findIndex(function (value,index,arr) {
+                    return value === message
+                });
+                this.Message.splice(index,1)
+            },
+
+            addActivities: function () {
                 if (this.Name === "") {
                     this.message = "请输入活动名称!";
                     return
-                }else if (!check(this.date)){
-                    this.message = "请输入正确的时间格式！"
+                } else if (!check(this.date)) {
+                    this.message = "请输入正确的时间格式！";
                     return
                 } else if (this.Introduction === "") {
                     this.message = "请输入活动内容！";
                     return
                 }
+                console.log(this.Message)
                 axios.get(addurl, {
-                        params: {
-                            Name: this.Name,
-                            Introduction: this.Introduction,
-                            date:this.date,
-                        }
-                    })
+                    params: {
+                        Name: this.Name,
+                        Introduction: this.Introduction,
+                        date: this.date,
+                        message: JSON.stringify(this.Message),
+                    }
+                })
                     .then(response => {
-                        if(response.data.Message === "成功！"){
+                        if (response.data.Message === "成功！") {
                             activities.getActivities();
                         }
                     })
-                    .catch(function(error) {
+                    .catch(function (error) {
                         checkError(error);
-                    })
+                    });
                 $('#add').modal('hide');
                 this.Name = '';
                 this.message = '';
@@ -385,175 +596,9 @@
             }
         }
 
-    })
+    });
 
-    var end = new Vue({
-        el: '#end',
-        data: function() {
-            let a = {
-                score: '',
-                message: '',
-                image: '',
-                images: [],
-                impression: '',
-                selected: '',
-            };
-            Object.assign(a,activity);
-            return a;
-        },
-        methods: {
-            onFileChange(e) {
-                var files = e.target.files || e.dataTransfer.files;
-                this.images = [];
-                if (!files.length)
-                    return;
-                for (var i = 0; i < files.length; i++) {
-                    this.createImage(files[i]);
-                }
-            },
-            createImage(file) {
-                var image = new Image();
-                var reader = new FileReader();
 
-                reader.onload = (e) => {
-                    this.images.push(e.target.result);
-                };
-                reader.readAsDataURL(file);
-            },
-            endActvities: function() {
-                if (this.selected === '') {
-                    this.message = "请输入选择活动！";
-                    return
-                } else if (this.score === '') {
-                    this.message = "请输入获得工时！";
-                    return
-                } else if (this.impression === '') {
-                    this.message = "请输入活动感受！";
-                    return
-                }
-                axios.post(endurl, {
-                        img: JSON.stringify(this.images),
-                        impression: this.impression,
-                        score: this.score,
-                        id: "" + this.selected
-                    })
-                    .then(response => {
-                        if (response.data.Message === "成功！"){
-                            activities.getActivities();
-                        }
-                    })
-                    .catch(function(error) {
-                        checkError(error);
-                    })
-                $('#end').modal('hide');
-                this.impression = '';
-                this.score = '';
-                this.selected = '';
-                this.images = [];
-                this.message = '';
-            }
-        }
-    })
-
-    var addStu = new Vue({
-        el: '#addStu',
-        data: function() {
-            let a =  {
-                grade: ['初一', '初二', '初三', '高一', '高二', '高三'],
-                selectGrade: '<<<.teacher.Grade>>>',
-                isGrade: false,
-                classes: [],
-                selectClass: '<<<.teacher.Class>>>',
-                isClass: false,
-                student: [],
-                selectStudent: '',
-                activities: [],
-                selected: '',
-                message: '',
-            };
-            Object.assign(a,activity);
-            return a;
-        },
-        mounted: function() {   
-            if (this.selectGrade !== ''){
-                if (this.selectClass !== ''){
-                    this.checkStudent();
-                }else{
-                    this.checkClass()
-                }
-            }
-
-        },
-        methods: {
-            clear: function() {
-                this.selectGrade = '';
-                this.classes = [];
-                this.selectClass = '';
-                this.student = [];
-                this.selectStudent = '';
-                this.selected = '';
-                this.message = '';
-            },
-            checkClass: function() {
-                axios.get(classurl, {
-                        params: {
-                            grade: this.selectGrade,
-                        }
-                    })
-                    .then(response => {
-                        if (response.data.Message === "成功！"){
-                            this.classes = response.data;
-                        }
-                    })
-                    .catch(function(error) {
-                        console.log(error)
-                    })
-            },
-            checkStudent: function() {
-                axios.get(studenturl, {
-                        params: {
-                            grade: this.selectGrade,
-                            class: this.selectClass,
-                        }
-                    })
-                    .then(response => {
-                        if (response.data.Message === "成功！"){
-                            this.student = response.data;
-                        }
-                    })
-                    .catch(function(error) {
-                        console.log(error)
-                    })
-            },
-            addstu: function() {
-                if (this.selected === "") {
-                    this.message = "请选择活动！";
-                    return
-                } else if (this.selectStudent === "") {
-                    this.message = "请选择添加的同学！";
-                    return
-                }
-                axios.get(addstuurl, {
-                        params: {
-                            name: this.selectStudent,
-                            activityId: this.selected,
-                        }
-                    })
-                    .then(response => {
-                        if (response.data.Message === "成功！"){
-                            activities.getActivity();
-                        }
-                    })
-                    .catch(function(error) {
-                        console.log(error)
-                    })
-
-                $('#addStu').modal('hide');
-                this.clear();
-            }
-        }
-    })
-    
     </script>
     <script src="/js/semantic.min.js"></script>
     <script type="text/javascript">

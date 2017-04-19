@@ -1,8 +1,6 @@
 package models
 
 import (
-	"encoding/json"
-
 	"github.com/astaxie/beego/orm"
 )
 
@@ -21,60 +19,21 @@ type Activity struct {
 }
 
 //返回一个slice 这个活动都谁参加
+//输出：这个活动都谁参加
 func (a *Activity) ShowWhoJion() (data []OutTeacherJion, err error) {
 	o := orm.NewOrm()
-	_, err = o.Raw("select j.id,s.class,s.grade,s.name,j.status from jion j,student s where j.student_id = s.id and j.activity_id = ?", a.Id).QueryRows(&data)
+	_, err = o.Raw("select j.id,s.class,s.grade,s.name,j.status,j.message from jion j,student s where j.student_id = s.id and j.activity_id = ?", a.Id).QueryRows(&data)
 	return
 }
 
-//
+//读取活动信息
 func (a *Activity) Read() (err error) {
 	o := orm.NewOrm()
 	err = o.Read(a)
 	return
 }
 
-//得到活动的额外信息
-//使用json格式从数据库读出
-func (a *Activity) GetMessage() (out []Message, err error) {
-	if a.Message == "" {
-		return
-	}
-	out, err = GetJson(a.Message)
-	return
-}
-
-func (a *Activity) GetImagePath() (imagepath []string, err error) {
-	message, err := GetJson(a.ImagePath)
-	if err != nil {
-		return
-	}
-	for _, m := range message {
-		imagepath = append(imagepath, m.Mess)
-	}
-	return
-}
-
-//把活动的额外信息转换为json格式
-func (a *Activity) SetMessage(message []Message) (err error) {
-	a.Message, err = SetJson(message)
-	return
-}
-
-func (a *Activity) SetImagePath(in string) (err error) {
-	var inn []string
-	err = json.Unmarshal([]byte(in), &inn)
-	if err != nil {
-		return
-	}
-	var mess []Message
-	for _, i := range inn {
-		mess = append(mess, Message{Name: "ImagePath", Mess: i})
-		a.ImagePath, err = SetJson(mess)
-	}
-	return
-}
-
+//新发布活动
 func (a *Activity) Insert() (err error) {
 	o := orm.NewOrm()
 	a.Isrecruit = true
@@ -85,7 +44,8 @@ func (a *Activity) Insert() (err error) {
 	return
 }
 
-func (a *Activity) Update() (err error) {
+//结束活动
+func (a *Activity) EndActivity() (err error) {
 	o := orm.NewOrm()
 	a.Isrecruit = false
 	if a.ImagePath == "" {
@@ -95,12 +55,25 @@ func (a *Activity) Update() (err error) {
 	return
 }
 
+//删除活动
 func (a *Activity) Delete() (err error) {
 	o := orm.NewOrm()
-	_, err = o.QueryTable("jion").Filter("activity_id", a.Id).Delete()
+	_, err = o.Delete(a)
 	if err != nil {
 		return
 	}
-	_, err = o.Delete(a)
+	_, err = o.QueryTable("jion").Filter("activity_id", a.Id).Delete()
+	return
+}
+
+func (a *Activity) Update() (err error) {
+	o := orm.NewOrm()
+	_, err = o.QueryTable("jion").Filter("activity_id", a.Id).Update(orm.Params{
+		"ischanged": true,
+	})
+	if err != nil{
+		return
+	}
+	_,err = o.Update(a)
 	return
 }
