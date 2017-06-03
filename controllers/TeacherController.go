@@ -11,7 +11,7 @@ type TeacherController struct {
 
 func (c *TeacherController) Prepare() {
 	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Credentials", "true")
-	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", "*")
+	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
 }
 
 //添加活动

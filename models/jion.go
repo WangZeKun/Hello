@@ -16,23 +16,6 @@ type Jion struct {
 	Message    string                                //额外信息
 }
 
-type OutTeacherJion struct {
-	Id      string
-	Class   string
-	Grade   string
-	Status  string
-	Name    string
-	Message string
-}
-
-type OutStudentJion struct {
-	Id       string
-	Date     string
-	Name     string
-	Status   string
-	WhoBuild string
-}
-
 //得到时间
 //输出@string:时间
 func (c Jion) GetTime() (out string) {

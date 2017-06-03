@@ -13,7 +13,7 @@ type StudentController struct {
 
 func (c *StudentController) Prepare() {
 	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Credentials", "true")
-	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", "*")
+	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
 }
 
 
@@ -84,5 +84,21 @@ func (c *StudentController) SetJion() {
 		}
 		c.Data["json"] = sendMessage("报名成功！", nil)
 	}
+	c.ServeJSON()
+}
+
+func (c *StudentController) GetSingle()  {
+	i ,err:= c.GetInt("id")
+	if err !=nil{
+		c.Abort("500")
+		beego.Error(err)
+	}
+	data := models.Activity{Id:i}
+	err = data.Read()
+	if err !=nil{
+		c.Abort("500")
+		beego.Error(err)
+	}
+	c.Data["json"] = sendMessage("成功！",data)
 	c.ServeJSON()
 }

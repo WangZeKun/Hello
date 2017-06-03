@@ -20,9 +20,9 @@ func init() {
 	beego.Router("/message/exit", &controllers.UtilController{}, "get:Exit")
 	beego.Router("/message/change", &controllers.UtilController{}, "get:Change")
 	beego.Router("/message/login", &controllers.UtilController{}, "get:Login")
+	beego.Router("/message/single",&controllers.StudentController{},"get:GetSingle")
 
 	//学生界面请求
-	beego.Router("/message/student", &controllers.StudentController{}, "get:GetStudentMessage")
 	beego.Router("/message/student/canjia", &controllers.StudentController{}, "get:GetCanjia")
 	beego.Router("/message/student/activity", &controllers.StudentController{}, "get:GetActivity")
 	beego.Router("/message/student/jion", &controllers.StudentController{}, "get:SetJion")
