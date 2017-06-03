@@ -11,7 +11,7 @@ type UtilController struct {
 
 func (c *UtilController) Prepare() {
 	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Credentials", "true")
-	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8100")
+	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", "*")
 }
 
 //跳转
@@ -88,14 +88,22 @@ func (c *UtilController) Login() {
 			sess.Set("select",user.Who)
 			beego.Informational(sess.SessionID())
 			defer sess.SessionRelease(c.Ctx.ResponseWriter)
-			c.Data["json"] = sendMessage("成功，学生登录！", sess.SessionID())
+			c.Data["json"] = sendMessage("成功，学生登录！",
+				map[string]interface{}{
+					"id":sess.SessionID(),
+					"user":getStudentMessage(user.Username),
+				})
 		} else if c.GetString("select") == "教师登陆" && user.Who == "teacher" {
 			c.SetSession("username", user.Username)
 			c.SetSession("select", user.Who)
 			sess := c.StartSession()
 			beego.Informational(sess.SessionID())
 			defer sess.SessionRelease(c.Ctx.ResponseWriter)
-			c.Data["json"] = sendMessage("成功，教师登录！", sess.SessionID())
+			c.Data["json"] = sendMessage("成功，教师登录！",
+				map[string]interface{}{
+					"id":sess.SessionID(),
+					"user":getTeacherMessage(user.Username),
+				})
 		} else {
 			c.Data["json"] = sendMessage("请选择正确的登录用户！", nil)
 		}
@@ -103,4 +111,17 @@ func (c *UtilController) Login() {
 		c.ServeJSON()
 		//c.Ctx.WriteString(str(err))
 	}
+}
+
+//获取学生信息
+func getStudentMessage(id string)(stu models.Student) {
+	stu.Id = id
+	stu.Read()
+	return stu
+}
+
+func getTeacherMessage(id string)(tea models.Teacher){
+	tea.Id = id
+	tea.Read()
+	return tea
 }
