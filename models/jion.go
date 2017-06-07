@@ -45,3 +45,9 @@ func (c *Jion) Update() error {
 	_, err := o.Update(c, "status")
 	return err
 }
+
+func JionUpdate(js []Jion) error{
+	o:=orm.NewOrm()
+	_,err := o.Update(&js,"status")
+	return err
+}

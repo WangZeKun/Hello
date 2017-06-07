@@ -5,17 +5,17 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func init() {
-	// set default database
-	orm.RegisterDataBase("default", "mysql", "gqmms:pf6zbbF2tt@tcp(127.0.0.1:3306)/gqmms?charset=utf8", 30)
-
-	// register model
-	orm.RegisterModel(new(Login), new(Student), new(Activity), new(Jion), new(Exam), new(Teacher))
-
-	// create table
-	orm.RunSyncdb("default", false, true)
-	orm.Debug = true
-}
+//func init() {
+//	// set default database
+//	orm.RegisterDataBase("default", "mysql", "gqmms:pf6zbbF2tt@tcp(127.0.0.1:3306)/gqmms?charset=utf8", 30)
+//
+//	// register model
+//	orm.RegisterModel(new(Login), new(Student), new(Activity), new(Jion), new(Exam), new(Teacher))
+//
+//	// create table
+//	orm.RunSyncdb("default", false, true)
+//	orm.Debug = true
+//}
 
 //得到哪些活动正在报名
 func ShowActivities(who string) (data []Activity, err error) {

@@ -1,4 +1,5 @@
 tests/
+swagger/
 logs/
 .vscode/
 hello*
