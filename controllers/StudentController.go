@@ -20,13 +20,13 @@ func (c *StudentController) Prepare() {
 
 //@Title 得到报名活动信息
 //@Description 获取学生参加活动的信息
-//@Success 200 {object} models.model.OutStudentJion
+//@Success 200 {object} models.model.OutStudentJoin
 //@Failure 500 数据库错误
 //@router /canjia [get]
 func (c *StudentController) GetCanjia() {
 	sess := c.GetSession("username")
 	stu := models.Student{Id: sess.(string)}
-	j, err := stu.ShowWhatJion()
+	j, err := stu.ShowWhatJoin()
 	if err != nil {
 		beego.Error(err)
 		c.Abort("500")
@@ -64,7 +64,7 @@ func (c *StudentController) GetActivity() {
 		beego.Error("输入错误")
 		c.Abort("401")
 	}
-	data, err := models.ShowActivities(name)
+	data, err := models.ShowActivities(name,true)
 	if err != nil {
 		beego.Error(err)
 		c.Abort("500")
@@ -77,26 +77,26 @@ func (c *StudentController) GetActivity() {
 //@Description 报名活动，并输入活动的信息,报名后等待老师审核
 //@Success 200 {string} "您已经报过名了！" 或 "报名成功！"
 //@Param id query string true 活动ID
-//@Param message query object false 在活动有额外信息的时候是必填的
+//@Param message query Array<string> false 在活动有额外信息的时候是必填的
 //@Failure 500 数据库错误
-//@router /jion [get]
-func (c *StudentController) SetJion() {
+//@router /join [get]
+func (c *StudentController) Setjoin() {
 	sess := c.GetSession("username")
-	jion := models.Jion{
+	join := models.Join{
 		ActivityId: c.GetString("id"),
 		StudentId:  sess.(string),
 		Message:    c.GetString("message"),
 	}
-	if jion.Message == "" {
-		jion.Message = "[]"
+	if join.Message == "" {
+		join.Message = "{}"
 	}
-	b := jion.Check()
+	b := join.Check()
 	if b {
 		c.Data["json"] = "您已经报过名了！"
 	} else {
-		jion.Status = "审核中"
-		jion.Date = time.Now()
-		err := jion.Insert()
+		join.Status = "审核中"
+		join.Date = time.Now()
+		err := join.Insert()
 		if err != nil {
 			beego.Error(err)
 			c.Abort("500")

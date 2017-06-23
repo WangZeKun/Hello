@@ -5,42 +5,59 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-//func init() {
-//	// set default database
-//	orm.RegisterDataBase("default", "mysql", "gqmms:pf6zbbF2tt@tcp(127.0.0.1:3306)/gqmms?charset=utf8", 30)
-//
-//	// register model
-//	orm.RegisterModel(new(Login), new(Student), new(Activity), new(Jion), new(Exam), new(Teacher))
-//
-//	// create table
-//	orm.RunSyncdb("default", false, true)
-//	orm.Debug = true
-//}
+func init() {
+	// set default database
+	orm.RegisterDataBase("default", "mysql", "gqmms:pf6zbbF2tt@tcp(47.94.91.118:3306)/gqmms?charset=utf8", 30)
 
-//得到哪些活动正在报名
-func ShowActivities(who string) (data []Activity, err error) {
-	o := orm.NewOrm()
-	_, err = o.QueryTable("activity").Filter("isrecruit", true).Filter("who_build", who).All(&data)
-	return
+	// register model
+	orm.RegisterModel(new(Login),
+		new(Student),
+		new(Activity),
+		new(Join),
+		new(Exam),
+		new(Teacher),
+		new(Photo),
+	)
+
+	// create table
+	orm.Debug = true
 }
 
-//得到已经结束的活动
-func ShowAllActivities() (data []Activity, err error) {
+//得到哪些活动正在报名
+func ShowActivities(who string, is bool) (data []Activity, err error) {
 	o := orm.NewOrm()
-	_, err = o.QueryTable("activity").Filter("isrecruit", false).All(&data)
+	qb, _ := orm.NewQueryBuilder("mysql")
+	qb.Select("id", "name").
+		From("activity").
+		Where("isrecruit=?").
+		And("who_build=?").
+		OrderBy("endstartDate").Desc()
+	_, err = o.Raw(qb.String(), is, who).QueryRows(&data)
 	return
 }
 
 //得到这个年纪的班级
 func CheckClass(grade string) (class []string, err error) {
 	o := orm.NewOrm()
-	_, err = o.Raw("select distinct class from student where grade = ? order by class", grade).QueryRows(&class)
+	qb, _ := orm.NewQueryBuilder("mysql")
+	qb.Select("distinct class").
+		From("student").
+		Where("grade =?").
+		OrderBy("class").Asc()
+	_, err = o.Raw(qb.String(), grade).QueryRows(&class)
 	return
 }
 
 //得到这个班的同学
 func CheckStudent(grade, class string) (student []Student, err error) {
 	o := orm.NewOrm()
+	qb, _ := orm.NewQueryBuilder("mysql")
+	qb.Select("id",
+		"name").
+		From("student").
+		Where("grade=?").
+		And("class = ?").
+		OrderBy("class").Desc()
 	_, err = o.Raw("select id,name from student where grade = ? and class = ?", grade, class).QueryRows(&student)
 	return
 }
@@ -48,11 +65,12 @@ func CheckStudent(grade, class string) (student []Student, err error) {
 //获得学分
 func getScore(s *Student) (out OutScore, err error) {
 	o := orm.NewOrm()
-	err = o.Raw("SELECT sum(score) FROM gqmms.activity where id in (select activity_id from jion where student_id = ?)", s.Id).QueryRow(&out.Score)
+	err = o.Raw("SELECT sum(score) FROM gqmms.join where student_id =?", s.Id).
+		QueryRow(&out.Score)
 	if err != nil {
 		return
 	}
-	err = o.Raw("SELECT count(id) FROM gqmms.jion where student_id = ?", s.Id).QueryRow(&out.Num)
+	err = o.Raw("SELECT count(id) FROM gqmms.join where student_id = ? and status = '审核通过'", s.Id).QueryRow(&out.Num)
 	if err != nil {
 		return
 
@@ -70,13 +88,15 @@ func getScore(s *Student) (out OutScore, err error) {
 }
 
 //得到班级总分
-func GetClassScores(class, grade string) (out OutScore, err error) {
+func getClassScores(class, grade string) (out OutScore, err error) {
 	o := orm.NewOrm()
-	err = o.Raw("SELECT sum(score) FROM gqmms.activity where id in (select activity_id from jion where student_id in (select id from gqmms.student where class = ?  and grade = ? ))", class, grade).QueryRow(&out.Score)
+	err = o.Raw("select sum(score) from `join` where student_id "+
+		"in (select id from gqmms.student where class = ?  and grade = ? ))", class, grade).QueryRow(&out.Score)
 	if err != nil {
 		return
 	}
-	err = o.Raw("SELECT count(id) FROM gqmms.jion where student_id in (select id from gqmms.student where class = ? and grade = ? )", class, grade).QueryRow(&out.Num)
+	err = o.Raw("SELECT count(id) FROM gqmms.join where student_id in " +
+		"(select id from gqmms.student where class = ? and grade = ? ) and status = '审核通过'", class, grade).QueryRow(&out.Num)
 	if err != nil {
 		return
 	}
@@ -85,7 +105,7 @@ func GetClassScores(class, grade string) (out OutScore, err error) {
 	return
 }
 
-func GetScores(class, grade string) (o []OutScore, err error) {
+func GetScores(class, grade string) (out []OutScore, err error) {
 	or := orm.NewOrm()
 	if class == "" {
 		var classes []string
@@ -95,11 +115,11 @@ func GetScores(class, grade string) (o []OutScore, err error) {
 		}
 		for _, i := range classes {
 			var s OutScore
-			s, err = GetClassScores(i, grade)
+			s, err = getClassScores(i, grade)
 			if err != nil {
 				return
 			}
-			o = append(o, s)
+			out = append(out, s)
 		}
 	} else {
 		var students []Student
@@ -113,7 +133,7 @@ func GetScores(class, grade string) (o []OutScore, err error) {
 			if err != nil {
 				return
 			}
-			o = append(o, s)
+			out = append(out, s)
 
 		}
 	}
@@ -128,8 +148,7 @@ type OutScore struct {
 	Num   string
 }
 
-
-type OutTeacherJion struct {
+type OutTeacherJoin struct {
 	Id      string
 	Class   string
 	Grade   string
@@ -138,7 +157,7 @@ type OutTeacherJion struct {
 	Message string
 }
 
-type OutStudentJion struct {
+type OutStudentJoin struct {
 	Id       string
 	Date     string
 	Name     string

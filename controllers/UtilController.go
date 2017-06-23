@@ -33,7 +33,7 @@ func (c *UtilController) Text() {
 
 //@Title 修改密码
 //@Description 修改密码。。。。。。
-//@Success 200 {string} "原密码错误！"or"修改成功"
+//@Success 200  {string} Message 原密码错误！或修改成功！
 //@Failure 500 数据库错误
 //@Param password formData string true "密码"
 //@Param newPassword formData string true "新密码"
@@ -67,7 +67,7 @@ func (c *UtilController) Change() {
 func (c *UtilController) Exit() {
 	c.DelSession("username")
 	c.DelSession("select")
-	c.Redirect("/login", 302)
+	c.ServeJSON()
 }
 
 //@Title 获得信息
@@ -80,14 +80,14 @@ func (c *UtilController) Exit() {
 func (c *UtilController) GetSingle() {
 	i, err := c.GetInt("id")
 	if err != nil {
-		c.Abort("400")
 		beego.Error(err)
+		c.Abort("400")
 	}
 	data := models.Activity{Id: i}
 	err = data.Read()
 	if err != nil {
-		c.Abort("500")
 		beego.Error(err)
+		c.Abort("500")
 	}
 	c.Data["json"] = data
 	c.ServeJSON()
@@ -98,7 +98,7 @@ func (c *UtilController) GetSingle() {
 //@Success 200 {object} controllers.sendMessage.Send
 //@Param username formData string true "教育ID"
 //@Param password formData string true "密码"
-//@Param selsect formData string true "用户类型"
+//@Param select formData string true "用户类型"
 //@Failure 500 数据库错误
 //@router /login [post]
 func (c *UtilController) Login() {
@@ -140,6 +140,22 @@ func (c *UtilController) Login() {
 	}
 }
 
+//@Title 修改头像
+//@Description 修改用户头像
+//@Param img formData string true "头像图片"
+//@Failure 500 数据库错误
+//router /avatar [post]
+func (c *UtilController) ChangeAvatar(){
+	stu := models.Student{Id: c.GetString("username")}
+	err := stu.ChangeAvatar(c.GetString("img"))
+	if err != nil{
+		beego.Error(err)
+		c.Abort("500")
+	}
+	c.Data["json"] = "成功！"
+	c.ServeJSON()
+}
+
 //获取学生信息
 func getStudentMessage(id string) (stu models.Student) {
 	stu.Id = id
@@ -152,3 +168,4 @@ func getTeacherMessage(id string) (tea models.Teacher) {
 	tea.Read()
 	return tea
 }
+

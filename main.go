@@ -8,12 +8,8 @@ import (
 )
 
 func main() {
-	//beego.BConfig.WebConfig.Session.SessionProvider = "mysql"
-	//beego.BConfig.WebConfig.Session.SessionProviderConfig = "gqmms:pf6zbbF2tt@tcp(127.0.0.1:3306)/gqmms?charset=utf8"
-	if beego.BConfig.RunMode == "dev" {
-		beego.BConfig.WebConfig.DirectoryIndex = true
-		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
-	}
+	beego.BConfig.WebConfig.Session.SessionProvider = "mysql"
+	beego.BConfig.WebConfig.Session.SessionProviderConfig = "gqmms:pf6zbbF2tt@tcp(47.94.91.118:3306)/gqmms?charset=utf8"
 	beego.BConfig.WebConfig.Session.SessionOn = true
 	beego.SetStaticPath("css", "views/css")
 	beego.SetStaticPath("image", "views/image")

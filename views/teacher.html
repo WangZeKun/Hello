@@ -51,21 +51,21 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-if="jions===null">
+                    <tr v-if="joins===null">
                         <td>并没有人来报名</td>
                     </tr>
-                    <tr v-else v-for="(jion,index) in jions">
+                    <tr v-else v-for="(join,index) in joins">
                         <td scope="row">{{index+1}}</td>
-                        <td>{{jion.Grade}}</td>
-                        <td>{{jion.Class}}</td>
-                        <td>{{jion.Name}}</td>
-                        <td>{{jion.Status}}</td>
-                        <td v-for="i of jion.Message">{{i}}</td>
+                        <td>{{join.Grade}}</td>
+                        <td>{{join.Class}}</td>
+                        <td>{{join.Name}}</td>
+                        <td>{{join.Status}}</td>
+                        <td v-for="i of join.Message">{{i}}</td>
                         <td>
                             <div class="ui buttons">
-                                <button class="ui pink button" @click="setStatus(jion.Id,'审核通过')">通过</button>
+                                <button class="ui pink button" @click="setStatus(join.Id,'审核通过')">通过</button>
                                 <div class="or"></div>
-                                <button class="ui grey button" @click="setStatus(jion.Id,'审核不通过')">不通过</button>
+                                <button class="ui grey button" @click="setStatus(join.Id,'审核不通过')">不通过</button>
                             </div>
                         </td>
                     </tr>
@@ -466,11 +466,11 @@
                     })
                     .then(response => {
                         if(response.data.Message === "成功！"){
-                            this.jions = response.data.Data;
-                            console.log(this.jions);
-                            if (this.jions !== null){
-                                for (let x = 0;x<this.jions.length;x++){
-                                    this.jions[x].Message = JSON.parse(this.jions[x].Message)
+                            this.joins = response.data.Data;
+                            console.log(this.joins);
+                            if (this.joins !== null){
+                                for (let x = 0;x<this.joins.length;x++){
+                                    this.joins[x].Message = JSON.parse(this.joins[x].Message)
                                 }
                             }
 
@@ -481,10 +481,10 @@
                         checkError(error);
                     });
             },
-            setStatus: function(jionid, status) {
+            setStatus: function(joinid, status) {
                 axios.get(seturl, {
                         params: {
-                            jionid: jionid,
+                            joinid: joinid,
                             status: status,
                         }
                     })
@@ -530,7 +530,7 @@
             return {
                 activity: {},
                 activitie: [],
-                jions: [],
+                joins: [],
                 isActive: '',
                 activities:[],
             }

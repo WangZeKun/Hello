@@ -129,7 +129,7 @@
 <script src="/js/Api/api.js"></script>
 <script type="text/javascript">
     const activityurl = '/message/student/activity';
-    const setjionurl = '/message/student/jion';
+    const setjoinurl = '/message/student/join';
     const canjiaurl = '/message/student/canjia';
     const changerul = '/message/student/change';
     Vue.component('activity', {
@@ -147,8 +147,8 @@
             }
         },
         methods: {
-            setJion: function () {
-                axios.get(setjionurl, {
+            setjoin: function () {
+                axios.get(setjoinurl, {
                     params: {
                         activity_id: this.activity.Id,
                         message: JSON.stringify(this.Message)
@@ -214,7 +214,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="ui green  bottom attached button" tabindex="0" @click="setJion">报名此活动</div>
+                <div class="ui green  bottom attached button" tabindex="0" @click="setjoin">报名此活动</div>
                 <div class="ui dimmer">
                     <div class="content">
                         <div class="center">

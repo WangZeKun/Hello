@@ -13,11 +13,11 @@ import (
 
 func init() {
 	//网页请求
-	beego.Router("/login", &controllers.HtmlController{}, "get:LoginHtml")
-	beego.Router("/student", &controllers.HtmlController{}, "get:StudentHtml")
-	beego.Router("/teacher", &controllers.HtmlController{}, "get:TeacherHtml")
-	beego.Router("/end", &controllers.HtmlController{}, "get:CollectHtml")
-	beego.Router("/check", &controllers.HtmlController{}, "get:CheckHtml")
+	//beego.Router("/login", &controllers.HtmlController{}, "get:LoginHtml")
+	//beego.Router("/student", &controllers.HtmlController{}, "get:StudentHtml")
+	//beego.Router("/teacher", &controllers.HtmlController{}, "get:TeacherHtml")
+	//beego.Router("/end", &controllers.HtmlController{}, "get:CollectHtml")
+	//beego.Router("/check", &controllers.HtmlController{}, "get:CheckHtml")
 	ns := beego.NewNamespace("/v1",
 		beego.NSNamespace("/message",
 			beego.NSInclude(

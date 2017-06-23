@@ -57,8 +57,6 @@ func (c *TeacherController) Add() {
 //@Param img formData string false 活动照片(base64)
 //@router /end [post]
 func (c *TeacherController) Accept() {
-	beego.Informational(c.GetString("id"))
-	beego.Informational(c.GetString("score"))
 	n, err := c.GetInt("id")
 	if err != nil {
 		beego.Error(err)
@@ -71,14 +69,13 @@ func (c *TeacherController) Accept() {
 		c.Abort("500")
 	}
 	n, err = c.GetInt("score")
-	activity.Score = n
 	if err != nil {
 		beego.Error(err)
 		c.Abort("500")
 	}
 	activity.Impression = c.GetString("impression")
-	activity.ImagePath = c.GetString("img")
-	err = activity.EndActivity()
+	err = activity.EndActivity(n)
+	beego.Error(n)
 	if err != nil {
 		beego.Error(err)
 		c.Abort("500")
@@ -89,21 +86,21 @@ func (c *TeacherController) Accept() {
 
 //@Title 添加同学
 //@Description 为活动添加同学
-//Success 200 {string} 成功！或此学生已经报过名了
-//Params studentId formData string true 教育ID
-//Params activityId formData string true 活动ID
-//Failure 500 数据库错误
+//@Success 200 {string} 成功！或此学生已经报过名了
+//@Params studentId formData string true 教育ID
+//@Params activityId formData string true 活动ID
+//@Failure 500 数据库错误
 //@router /addStu [post]
 func (c *TeacherController) AddStu() {
-	jion := models.Jion{StudentId: c.GetString("studentId"), ActivityId: c.GetString("activityId")}
-	b := jion.Check()
+	join := models.Join{StudentId: c.GetString("studentId"), ActivityId: c.GetString("activityId")}
+	b := join.Check()
 	if b {
 		c.Data["json"] = "此学生已经报过名了！"
 	}else{
 
-		jion.Status = "审核通过"
+		join.Status = "审核通过"
 
-		err := jion.Insert()
+		err := join.Insert()
 		if err != nil {
 			beego.Error("err")
 			c.Abort("500")
@@ -124,9 +121,9 @@ func (c *TeacherController) GetActivties() {
 	var activities []models.Activity
 	var err error
 	if c.GetString("status") == "now" {
-		activities, err = models.ShowActivities(c.GetSession("username").(string))
+		activities, err = models.ShowActivities(c.GetSession("username").(string),true)
 	} else if c.GetString("status") == "end"{
-		activities, err = models.ShowAllActivities()
+		activities, err = models.ShowActivities(c.GetSession("username").(string),false)
 	}else {
 		beego.Error("输入错误")
 		c.Abort("401")
@@ -142,19 +139,19 @@ func (c *TeacherController) GetActivties() {
 
 //@Title 得到同学
 //@Description 返回此活动报名的同学
-//@Success 200 {object} models.jion.Jion
+//@Success 200 {object} models.join.Join
 //@Param id query int true 活动ID
 //@Failure 500 数据库错误
 //@Failure 400 输入错误
-//@router /jions [get]
-func (c *TeacherController) GetJions() {
+//@router /joins [get]
+func (c *TeacherController) Getjoins() {
 	id, err := c.GetInt("id")
 	if err != nil {
 		beego.Error(err)
 		c.Abort("500")
 	}
 	a := models.Activity{Id: id}
-	j, err := a.ShowWhoJion()
+	j, err := a.ShowWhoJoin()
 	if err != nil {
 		beego.Error(err)
 		c.Abort("500")
@@ -166,27 +163,29 @@ func (c *TeacherController) GetJions() {
 
 //@Title 审核报名
 //@Description 通过或不通过学生的报名
-//Success 200 {string} 成功！
-//Params id formData Array<int> true 审核学生的教育ID
-//Params status formData string true 审核状态
+//@Success 200 {string} 成功！
+//@Params id formData Array<int> true 审核学生的教育ID
+//@Params status formData string true 审核状态
 //@Failure 500 数据库错误
 //@Failure 400 输入错误
 //@router /set [post]
 func (c *TeacherController) SetStatus() {
-	ids := c.GetString("id")
+	ids := "["+ c.GetString("id") + "]"
+	beego.Informational(ids)
 	var id []int
-	err := json.Unmarshal([]byte(ids), id)
+	err := json.Unmarshal([]byte(ids), &id)
+	beego.Informational(id)
 	if err != nil {
 		beego.Error(err)
 		c.Abort("401")
 	}
 	status := c.GetString("status")
-	js := []models.Jion{}
-	for i := range id {
-		j := models.Jion{Id: i, Status: status}
+	js := []models.Join{}
+	for _,i := range id {
+		j := models.Join{Id: i, Status: status}
 		js = append(js,j)
 	}
-	err = models.JionUpdate(js)
+	models.UpdateJoins(js)
 	if err != nil {
 		beego.Error(err)
 		c.Abort("500")
@@ -271,7 +270,7 @@ func (c *TeacherController) GetScore() {
 
 //@Title 更新活动
 //@Description 更新活动信息,并清除掉之前学生们的报名信息
-//@Success 200 {[]object} models.model.OutScore
+//@Success 200 {object} models.model.OutScore
 //@Param id dataForm int true 活动ID
 //@Param name formData string true 活动名称
 //@Param introduction formData string true 活动简介
@@ -313,4 +312,22 @@ func (c *TeacherController) UdActivity() {
 	}
 	c.Data["json"] = "成功！"
 	c.ServeJSON()
+}
+
+//@Title 添加图片
+//@Description 添加活动图片
+//@Success 200 {object} models.model.Photo
+//@Param id dataForm int true 活动ID
+//@Param photo formData string true 图片数据
+//@Failure 500 数据库错误
+//@Failure 400 输入错误
+//@router /photo [post]
+func (c *TeacherController) Photo()  {
+	id ,err := c.GetInt("id")
+	if err!=nil{
+		beego.Error(err)
+		c.Abort("400")
+	}
+	photo := models.Photo{ActivityId:id,Photo:c.GetString("photo")}
+	err = photo.Insert()
 }

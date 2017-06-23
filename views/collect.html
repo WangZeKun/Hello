@@ -56,15 +56,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-if="jions===null">
+                        <tr v-if="joins===null">
                             <td>并没有人来报名</td>
                         </tr>
-                        <tr v-else v-for="(jion,index) in jions">
+                        <tr v-else v-for="(join,index) in joins">
                             <td scope="row">{{index}}</td>
-                            <td>{{jion.Grade}}</td>
-                            <td>{{jion.Class}}</td>
-                            <td>{{jion.Name}}</td>
-                            <td>{{jion.Status}}</td>
+                            <td>{{join.Grade}}</td>
+                            <td>{{join.Class}}</td>
+                            <td>{{join.Name}}</td>
+                            <td>{{join.Status}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -117,7 +117,7 @@
                     })
                         .then(response => {
                             if (response.data.Message === "成功！"){
-                                this.jions = response.data.Data;
+                                this.joins = response.data.Data;
                                 this.image = JSON.parse(this.activity.ImagePath);
                             }
                         })
@@ -138,7 +138,7 @@
                 return {
                     activitie: [],
                     activity: {},
-                    jions: [],
+                    joins: [],
                     image: [],
                     isActive: '',
                 }

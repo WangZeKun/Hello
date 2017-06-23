@@ -43,9 +43,10 @@ func (s *Student) Read() (err error) {
 }
 
 //得到这个学生都参加了什么活动
-func (s *Student) ShowWhatJion() (data []OutStudentJion, err error) {
+func (s *Student) ShowWhatJoin() (data []OutStudentJoin, err error) {
 	o := orm.NewOrm()
-	_, err = o.Raw("select j.id,a.name,j.date,j.status,a.who_build,a.date as adate from jion j,activity a where j.activity_id = a.id and j.student_id = ?", s.Id).QueryRows(&data)
+	_, err = o.Raw("select j.id,a.name,j.date,j.status,a.who_build,a.date as adate from `join` j,activity a where j.activity_id = a.id and j.student_id = ?", s.Id).
+		QueryRows(&data)
 	return
 }
 
@@ -66,3 +67,9 @@ func (s Student) CheckGradeTeacher() (out string, err error) {
 	return
 }
 
+//修改头像
+func (s *Student)ChangeAvatar(img string)(err error){
+	o := orm.NewOrm()
+	_,err = o.Update(s,"avatar")
+	return
+}
