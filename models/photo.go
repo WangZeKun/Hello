@@ -1,21 +1,18 @@
 package models
 
-import "github.com/astaxie/beego/orm"
-
 type Photo struct {
-	Id int `orm:"auto"`
+	Id int `xorm:"autoincr"`
 	ActivityId int
-	Photo string
+	Photo string `xorm:"LONGTEXT"`
 }
 
 func (p *Photo) Insert() (err error) {
-	o:=orm.NewOrm()
-	_,err = o.Insert(p)
+	_,err = engine.Insert(p)
 	return
 }
 
-func (p *Photo) Delete() (err error){
-	o := orm.NewOrm()
-	_,err = o.Delete(p)
+func GetPhotos(activityId int)(photos []Photo,err error)  {
+	err = engine.Where("activity_id = ?",activityId).Find(&photos)
 	return
 }
+

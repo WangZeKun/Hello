@@ -26,7 +26,6 @@ func init() {
 		),
 		beego.NSNamespace("/student",
 			beego.NSBefore(func(ctx *context.Context) {
-				beego.Informational(123456)
 				s := ctx.Input.Session("select")
 				if s == nil || s.(string) != "student" {
 					ctx.ResponseWriter.WriteHeader(401)

@@ -26,20 +26,15 @@ func (c *TeacherController) Prepare() {
 //@Failure 500 数据库错误
 //@router /add [post]
 func (c *TeacherController) Add() {
-	message := c.GetString("message")
-	beego.Informational(message)
-	if message == "" {
-		message = "[]"
-	}
 	activity := models.Activity{
 		Name:         c.GetString("name"),
 		Introduction: c.GetString("introduction"),
 		WhoBuild:     c.GetSession("username").(string),
 		Date:         c.GetString("date"),
-		Message:      message,
 	}
+	err := json.Unmarshal([]byte(c.GetString("message")),&activity.Message)
 	beego.Informational(activity.Message)
-	err := activity.Insert()
+	err = activity.Insert()
 	if err != nil {
 		beego.Error(err)
 		c.Abort("500")
@@ -53,7 +48,7 @@ func (c *TeacherController) Add() {
 //@Success 200 {string} 成功！
 //@Param id formData int true 活动名称
 //@Param score formData string false 活动学分
-//@Param impression formData string ture 活动感受
+//@Param impression formData string true 活动感受
 //@Param img formData string false 活动照片(base64)
 //@router /end [post]
 func (c *TeacherController) Accept() {
@@ -68,14 +63,26 @@ func (c *TeacherController) Accept() {
 		beego.Error(err)
 		c.Abort("500")
 	}
-	n, err = c.GetInt("score")
+	score, err := c.GetInt("score")
 	if err != nil {
 		beego.Error(err)
 		c.Abort("500")
 	}
 	activity.Impression = c.GetString("impression")
-	err = activity.EndActivity(n)
-	beego.Error(n)
+	var imgs []string
+	json.Unmarshal([]byte(c.GetString("img")),&imgs)
+	for _,img := range imgs{
+		i := models.Photo{
+			ActivityId: n,
+			Photo:      img,
+		}
+		err = i.Insert()
+		if err != nil {
+			beego.Error(err)
+			c.Abort("500")
+		}
+	}
+	err = activity.EndActivity(score)
 	if err != nil {
 		beego.Error(err)
 		c.Abort("500")
@@ -92,8 +99,13 @@ func (c *TeacherController) Accept() {
 //@Failure 500 数据库错误
 //@router /addStu [post]
 func (c *TeacherController) AddStu() {
-	join := models.Join{StudentId: c.GetString("studentId"), ActivityId: c.GetString("activityId")}
-	b := join.Check()
+	activityId,_ := c.GetInt("activityId")
+	join := models.Join{StudentId: c.GetString("studentId"), ActivityId: activityId}
+	b,err := join.Check()
+	if err != nil {
+		beego.Error(err)
+		c.Abort("500")
+	}
 	if b {
 		c.Data["json"] = "此学生已经报过名了！"
 	}else{
@@ -102,7 +114,7 @@ func (c *TeacherController) AddStu() {
 
 		err := join.Insert()
 		if err != nil {
-			beego.Error("err")
+			beego.Error(err)
 			c.Abort("500")
 		}
 		c.Data["json"] = "成功！"
@@ -180,12 +192,14 @@ func (c *TeacherController) SetStatus() {
 		c.Abort("401")
 	}
 	status := c.GetString("status")
-	js := []models.Join{}
 	for _,i := range id {
 		j := models.Join{Id: i, Status: status}
-		js = append(js,j)
+		err = j.Update()
+		if err != nil {
+			beego.Error(err)
+			c.Abort("500")
+		}
 	}
-	models.UpdateJoins(js)
 	if err != nil {
 		beego.Error(err)
 		c.Abort("500")
@@ -235,7 +249,7 @@ func (c *TeacherController) GetClass() {
 
 //@Title 获得同学
 //@Description 返回所在班级的同学
-//@Success 200 {[]object} models.student.Student
+//@Success 200 {[]object} models.student.Number
 //@Param grade query string true 年级
 //@Param class query string true 班级
 //@Failure 500 数据库错误
@@ -282,33 +296,24 @@ func (c *TeacherController) GetScore() {
 func (c *TeacherController) UdActivity() {
 	id, err := c.GetInt("id")
 	if err != nil {
-		c.Abort("401")
+		c.Abort("400")
 		beego.Error(err)
 	}
 	activity := models.Activity{
 		Id:           id,
+		Name:c.GetString("name"),
+		Introduction:c.GetString("introduction"),
+		Date:c.GetString("date"),
 	}
-	err = activity.Read()
+	err = json.Unmarshal([]byte(c.GetString("message")),&activity.Message)
 	if err != nil {
-		c.Abort("500")
 		beego.Error(err)
-	}
-	if c.GetString("name") != ""{
-		activity.Name = c.GetString("name")
-	}
-	if c.GetString("introduction") != ""{
-		activity.Introduction = c.GetString("introduction")
-	}
-	if c.GetString("date") != ""{
-		activity.Date =  c.GetString("date")
-	}
-	if c.GetString("message") != ""{
-		activity.Message = c.GetString("message")
+		c.Abort("500")
 	}
 	err = activity.Update()
 	if err != nil {
-		c.Abort("500")
 		beego.Error(err)
+		c.Abort("500")
 	}
 	c.Data["json"] = "成功！"
 	c.ServeJSON()
@@ -316,7 +321,7 @@ func (c *TeacherController) UdActivity() {
 
 //@Title 添加图片
 //@Description 添加活动图片
-//@Success 200 {object} models.model.Photo
+//@Success 200 {object} models.photo.Photo
 //@Param id dataForm int true 活动ID
 //@Param photo formData string true 图片数据
 //@Failure 500 数据库错误
@@ -330,4 +335,22 @@ func (c *TeacherController) Photo()  {
 	}
 	photo := models.Photo{ActivityId:id,Photo:c.GetString("photo")}
 	err = photo.Insert()
+}
+
+//@Title 获得图片
+//Description 得到活动图片
+//Success 200 {object} models.photo.Photo
+//Param id query int true 活动ID
+//@Failure 500 数据库错误
+//@Failure 400 输入错误
+//@router /getPhotos [get]
+func (c *TeacherController) GetPhotos() {
+	id,err := c.GetInt("id")
+	if err != nil{
+		beego.Error(err)
+		c.Abort("400")
+	}
+	photos,err := models.GetPhotos(id)
+	c.Data["json"] = photos
+	c.ServeJSON()
 }

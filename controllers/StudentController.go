@@ -5,6 +5,7 @@ import (
 
 	"github.com/astaxie/beego"
 	"time"
+	"encoding/json"
 )
 
 //学生端API
@@ -25,7 +26,7 @@ func (c *StudentController) Prepare() {
 //@router /canjia [get]
 func (c *StudentController) GetCanjia() {
 	sess := c.GetSession("username")
-	stu := models.Student{Id: sess.(string)}
+	stu := models.Number{Id: sess.(string)}
 	j, err := stu.ShowWhatJoin()
 	if err != nil {
 		beego.Error(err)
@@ -47,14 +48,14 @@ func (c *StudentController) GetActivity() {
 	var err error
 	sess := c.GetSession("username")
 	if name == "class" {
-		stu := models.Student{Id: sess.(string)}
+		stu := models.Number{Id: sess.(string)}
 		name, err = stu.CheckClassTeacher()
 		if err != nil {
 			beego.Error(err)
 			c.Abort("500")
 		}
 	} else if name == "grade" {
-		stu := models.Student{Id: sess.(string)}
+		stu := models.Number{Id: sess.(string)}
 		name,err = stu.CheckGradeTeacher()
 		if err != nil {
 			beego.Error(err)
@@ -82,15 +83,21 @@ func (c *StudentController) GetActivity() {
 //@router /join [get]
 func (c *StudentController) Setjoin() {
 	sess := c.GetSession("username")
+	id,err := c.GetInt("id")
+	if err != nil {
+		beego.Error(err)
+		c.Abort("400")
+	}
 	join := models.Join{
-		ActivityId: c.GetString("id"),
+		ActivityId: id,
 		StudentId:  sess.(string),
-		Message:    c.GetString("message"),
 	}
-	if join.Message == "" {
-		join.Message = "{}"
+	err = json.Unmarshal([]byte(c.GetString("message")),&join.Message)
+	b ,err:= join.Check()
+	if err != nil{
+		beego.Error(err)
+		c.Abort("500")
 	}
-	b := join.Check()
 	if b {
 		c.Data["json"] = "您已经报过名了！"
 	} else {
@@ -103,5 +110,44 @@ func (c *StudentController) Setjoin() {
 		}
 		c.Data["json"] = "报名成功！"
 	}
+	c.ServeJSON()
+}
+
+//@Title 获得消息
+//@Description 获得消息
+//@Success 200 {string} "成功！"
+//@Failure 500 数据库错误
+//@router /notice [get]
+func (c *StudentController)GetNotices()  {
+	sess := c.GetSession("username")
+	stu := models.Number{Id:sess.(string)}
+	data,err := stu.ShowNotice()
+	if err!=nil{
+		beego.Error(err)
+		c.Abort("500")
+	}
+	c.Data["json"]=data
+	c.ServeJSON()
+}
+
+//@Title 已读消息
+//@Success 200 {string} "成功！"
+//@Param id query string true 消息ID
+//@Failure 500 数据库错误参数错误
+//@Failure 400
+//@router /readNotice [get]
+func (c *StudentController)ReadNotices()  {
+	id,err:=c.GetInt("id")
+	if err != nil{
+		beego.Error(err)
+		c.Abort("400")
+	}
+	n:=models.Notice{Id:id}
+	err = n.Delete()
+	if err != nil{
+		beego.Error(err)
+		c.Abort("500")
+	}
+	c.Data["json"]= "成功！"
 	c.ServeJSON()
 }

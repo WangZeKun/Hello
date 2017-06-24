@@ -40,13 +40,13 @@ func (c *UtilController) Text() {
 //@router /change [post]
 func (c *UtilController) Change() {
 	sess := c.GetSession("username")
-	user := models.Login{Username: sess.(string)}
-	err := user.Read()
+	user := models.Login{Username: sess.(string), Password: c.GetString("password")}
+	b, err := user.Check()
 	if err != nil {
 		beego.Error(err)
 		c.Abort("500")
 	}
-	if user.Password != c.GetString("password") {
+	if !b {
 		c.Data["json"] = "原密码错误！"
 	} else {
 		user.Password = c.GetString("newPassword")
@@ -102,8 +102,8 @@ func (c *UtilController) GetSingle() {
 //@Failure 500 数据库错误
 //@router /login [post]
 func (c *UtilController) Login() {
-	user := models.Login{Username: c.GetString("username")}
-	b, err := user.Check(c.GetString("password"))
+	user := models.Login{Username: c.GetString("username"), Password: c.GetString("password")}
+	b, err := user.Check()
 	if err != nil {
 		c.Abort("500")
 		beego.Error(err)
@@ -120,7 +120,7 @@ func (c *UtilController) Login() {
 			c.Data["json"] = sendMessage("成功，学生登录！",
 				map[string]interface{}{
 					"id":   sess.SessionID(),
-					"user": getStudentMessage(user.Username),
+					"user": getNumberMessage(user.Username, "student"),
 				})
 		} else if c.GetString("select") == "教师登陆" && user.Who == "teacher" {
 			c.SetSession("username", user.Username)
@@ -130,7 +130,7 @@ func (c *UtilController) Login() {
 			c.Data["json"] = sendMessage("成功，教师登录！",
 				map[string]interface{}{
 					"id":   sess.SessionID(),
-					"user": getTeacherMessage(user.Username),
+					"user": getNumberMessage(user.Username, "teacher"),
 				})
 		} else {
 			c.Data["json"] = sendMessage("请选择正确的登录用户！", nil)
@@ -145,10 +145,10 @@ func (c *UtilController) Login() {
 //@Param img formData string true "头像图片"
 //@Failure 500 数据库错误
 //router /avatar [post]
-func (c *UtilController) ChangeAvatar(){
-	stu := models.Student{Id: c.GetString("username")}
+func (c *UtilController) ChangeAvatar() {
+	stu := models.Number{Id: c.GetString("username")}
 	err := stu.ChangeAvatar(c.GetString("img"))
-	if err != nil{
+	if err != nil {
 		beego.Error(err)
 		c.Abort("500")
 	}
@@ -157,15 +157,9 @@ func (c *UtilController) ChangeAvatar(){
 }
 
 //获取学生信息
-func getStudentMessage(id string) (stu models.Student) {
+func getNumberMessage(id, t string) (stu models.Number) {
 	stu.Id = id
+	stu.Type = t
 	stu.Read()
 	return stu
 }
-
-func getTeacherMessage(id string) (tea models.Teacher) {
-	tea.Id = id
-	tea.Read()
-	return tea
-}
-
