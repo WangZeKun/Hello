@@ -1,8 +1,9 @@
 package controllers
 
 import (
-	"github.com/astaxie/beego"
 	"hello/models"
+
+	"github.com/astaxie/beego"
 )
 
 //工具类 API
@@ -12,7 +13,7 @@ type UtilController struct {
 
 func (c *UtilController) Prepare() {
 	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Credentials", "true")
-	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
+	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", "https://www.gqmms.wang")
 }
 
 //@Title 监测登录
@@ -153,6 +154,19 @@ func (c *UtilController) ChangeAvatar() {
 		c.Abort("500")
 	}
 	c.Data["json"] = "成功！"
+	c.ServeJSON()
+}
+
+
+//@Title 获取信息
+//@Description
+//@Param id Query string true 用户ID
+//@Param type Query string true 用户种类
+//Failure 500 数据库错误
+//router /person [get]
+func (c *UtilController) GetPerson(){
+	stu := getNumberMessage(c.GetString("id"),c.GetString("type"))
+	c.Data["json"] = stu
 	c.ServeJSON()
 }
 

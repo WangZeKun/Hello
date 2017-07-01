@@ -3,9 +3,10 @@ package controllers
 import (
 	"hello/models"
 
-	"github.com/astaxie/beego"
-	"time"
 	"encoding/json"
+	"time"
+
+	"github.com/astaxie/beego"
 )
 
 //学生端API
@@ -15,9 +16,8 @@ type StudentController struct {
 
 func (c *StudentController) Prepare() {
 	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Credentials", "true")
-	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:8080")
+	c.Ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", "https://www.gqmms.wang")
 }
-
 
 //@Title 得到报名活动信息
 //@Description 获取学生参加活动的信息
@@ -56,16 +56,16 @@ func (c *StudentController) GetActivity() {
 		}
 	} else if name == "grade" {
 		stu := models.Number{Id: sess.(string)}
-		name,err = stu.CheckGradeTeacher()
+		name, err = stu.CheckGradeTeacher()
 		if err != nil {
 			beego.Error(err)
 			c.Abort("500")
 		}
-	}else if name != "root" {
+	} else if name != "root" {
 		beego.Error("输入错误")
 		c.Abort("401")
 	}
-	data, err := models.ShowActivities(name,true)
+	data, err := models.ShowActivities(name, true)
 	if err != nil {
 		beego.Error(err)
 		c.Abort("500")
@@ -83,7 +83,7 @@ func (c *StudentController) GetActivity() {
 //@router /join [get]
 func (c *StudentController) Setjoin() {
 	sess := c.GetSession("username")
-	id,err := c.GetInt("id")
+	id, err := c.GetInt("id")
 	if err != nil {
 		beego.Error(err)
 		c.Abort("400")
@@ -92,9 +92,9 @@ func (c *StudentController) Setjoin() {
 		ActivityId: id,
 		StudentId:  sess.(string),
 	}
-	err = json.Unmarshal([]byte(c.GetString("message")),&join.Message)
-	b ,err:= join.Check()
-	if err != nil{
+	err = json.Unmarshal([]byte(c.GetString("message")), &join.Message)
+	b, err := join.Check()
+	if err != nil {
 		beego.Error(err)
 		c.Abort("500")
 	}
@@ -118,15 +118,15 @@ func (c *StudentController) Setjoin() {
 //@Success 200 {string} "成功！"
 //@Failure 500 数据库错误
 //@router /notice [get]
-func (c *StudentController)GetNotices()  {
+func (c *StudentController) GetNotices() {
 	sess := c.GetSession("username")
-	stu := models.Number{Id:sess.(string)}
-	data,err := stu.ShowNotice()
-	if err!=nil{
+	stu := models.Number{Id: sess.(string)}
+	data, err := stu.ShowNotice()
+	if err != nil {
 		beego.Error(err)
 		c.Abort("500")
 	}
-	c.Data["json"]=data
+	c.Data["json"] = data
 	c.ServeJSON()
 }
 
@@ -136,18 +136,18 @@ func (c *StudentController)GetNotices()  {
 //@Failure 500 数据库错误参数错误
 //@Failure 400
 //@router /readNotice [get]
-func (c *StudentController)ReadNotices()  {
-	id,err:=c.GetInt("id")
-	if err != nil{
+func (c *StudentController) ReadNotices() {
+	id, err := c.GetInt("id")
+	if err != nil {
 		beego.Error(err)
 		c.Abort("400")
 	}
-	n:=models.Notice{Id:id}
+	n := models.Notice{Id: id}
 	err = n.Delete()
-	if err != nil{
+	if err != nil {
 		beego.Error(err)
 		c.Abort("500")
 	}
-	c.Data["json"]= "成功！"
+	c.Data["json"] = "成功！"
 	c.ServeJSON()
 }
