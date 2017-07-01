@@ -136,7 +136,6 @@ func (c *UtilController) Login() {
 		} else {
 			c.Data["json"] = sendMessage("请选择正确的登录用户！", nil)
 		}
-
 		c.ServeJSON()
 	}
 }
@@ -165,7 +164,11 @@ func (c *UtilController) ChangeAvatar() {
 //Failure 500 数据库错误
 //router /person [get]
 func (c *UtilController) GetPerson(){
-	stu := getNumberMessage(c.GetString("id"),c.GetString("type"))
+	stu:= getNumberMessage(c.GetString("id"),c.GetString("type"))
+	//if err != nil{
+	//	beego.Error(err)
+	//	c.Abort("500")
+	//}
 	c.Data["json"] = stu
 	c.ServeJSON()
 }
@@ -175,5 +178,5 @@ func getNumberMessage(id, t string) (stu models.Number) {
 	stu.Id = id
 	stu.Type = t
 	stu.Read()
-	return stu
+	return
 }
